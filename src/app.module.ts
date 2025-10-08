@@ -5,6 +5,7 @@ import { TestModule } from './test/test.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
+import { SeederModule } from './seeder/seeder.module';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { MailModule } from './mail/mail.module';
     // TestModule,
     AuthModule,
     UsersModule,
-    MailModule
+    MailModule,
+    SeederModule,
   ],
   controllers: [],
   providers: [],
