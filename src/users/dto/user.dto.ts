@@ -171,10 +171,33 @@ export class UpdateProfileResponseDto {
     user: UserIdEmailDto;
 }
 
-export class VerifyEmailResponseDto{
+export class VerifyEmailResponseDto {
     @ApiProperty({ example: 'Email verified successfully', description: 'Operation message' })
     message: string;
 
     @ApiProperty({ type: UserIdEmailDto })
     user: UserIdEmailDto;
+}
+
+export class ForgetPasswordDto {
+    @ApiProperty({
+        description: 'Email of the user requesting password reset',
+        example: 'user@example.com',
+    })
+    @IsEmail({}, { message: 'Invalid email address' })
+    email: string;
+}
+
+export class ResetPasswordDto {
+    @ApiProperty({
+        description: 'New password for the user',
+        example: 'newStrongPassword123',
+        minLength: 6,
+    })
+    @IsString({ message: 'Password must be a string' })
+    @MinLength(6, { message: 'Password must be at least 6 characters long' })
+    @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]+$/, {
+        message: 'Password must contain at least one letter and one number',
+    })
+    password: string;
 }

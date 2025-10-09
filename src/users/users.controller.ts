@@ -1,6 +1,6 @@
 import { Controller, Post, Patch, Body, Param, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { AddAdminDto, AddAdminResponseDto, CompleteProfileDto, CompleteProfileResponseDto, UpdateProfileDto, UpdateProfileResponseDto, VerifyEmailResponseDto } from './dto/user.dto';
+import { AddAdminDto, AddAdminResponseDto, CompleteProfileDto, CompleteProfileResponseDto, ForgetPasswordDto, ResetPasswordDto, UpdateProfileDto, UpdateProfileResponseDto, VerifyEmailResponseDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -74,6 +74,25 @@ export class UsersController {
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Invalid token' })
   async verifyEmail(@Param('token') token: string) {
     return this.usersService.verifyNewEmail(token);
+  }
+
+  @Post('forget-password')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Request reset password email' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Email sent successfully' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
+  async forgetPassword(@Body() body: ForgetPasswordDto) {
+    return this.usersService.forgetPassword(body.email);
+  }
+
+  @Post('reset-password/:token')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Reset password using token' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Password reset successfully' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Token expired' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Invalid token or that email isnt last one' })
+  async resetPassword(@Param('token') token: string, @Body() body: ResetPasswordDto) {
+    return this.usersService.resetPassword(token, body.password);
   }
 
 }

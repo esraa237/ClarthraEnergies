@@ -96,7 +96,7 @@ export class UsersService {
 
   async verifyNewEmail(token: string) {
     const user = await this.userModel.findOne({ emailUpdateToken: token });
-    if (!user) throw new NotFoundException(UserMessages.INVALID_TOKEN);
+    if (!user) throw new BadRequestException(UserMessages.INVALID_TOKEN);
     if (!user.emailUpdateTokenExpiresAt || user.emailUpdateTokenExpiresAt < new Date()) throw new BadRequestException(UserMessages.TOKEN_EXPIRED);
     if (!user.newEmailPending) throw new BadRequestException(UserMessages.THE_LINK_EXPIRED_OR_PROFILE_COMPLETED);
 
@@ -107,6 +107,37 @@ export class UsersService {
     await user.save();
 
     return { message: UserMessages.EMAIL_VERIFIED_SUCCESSFULLY, user: { id: user._id, email: user.email } };
+  }
+  
+  // ------------------ FORGET & RESET PASSWORD ------------------ //
+
+  async forgetPassword(email: string) {
+    const user = await this.findByEmail(email);
+
+    const { token, expiresAt } = this.generateTokenWithExpiry(parseInt(process.env.RESET_PASSWORD_TOKEN_EXPIRY || '3600000', 10)); // default 1 hour
+    user.resetPasswordToken = token;
+    user.resetPasswordTokenExpiresAt = expiresAt;
+
+    await user.save();
+
+    const resetUrl = this.buildUrl('/reset-password', token);
+    await this.sendEmail(user.email, 'Reset Your Password', `Hello ${user.fullName || user.userName || 'User'},`, resetUrl, 'Reset Password');
+
+    return { message: UserMessages.RESET_EMAIL_SENT };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const user = await this.userModel.findOne({ resetPasswordToken: token });
+    if (!user) throw new BadRequestException(UserMessages.INVALID_TOKEN);
+    if (!user.resetPasswordTokenExpiresAt || user.resetPasswordTokenExpiresAt < new Date()) throw new BadRequestException('Token expired');
+
+    user.password = await bcrypt.hash(newPassword, Number(process.env.SALT_NUMBER) || 10);
+    user.resetPasswordToken = undefined;
+    user.resetPasswordTokenExpiresAt = undefined;
+
+    await user.save();
+
+    return { message: UserMessages.PASSWORD_RESET_SUCCESSFULLY };
   }
 
   // ------------------ FINDERS ------------------ //
