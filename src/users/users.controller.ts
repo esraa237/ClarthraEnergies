@@ -1,4 +1,4 @@
-import { Controller, Post, Patch, Body, Param, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Patch, Body, Param, UseGuards, HttpCode, HttpStatus, Query, Get } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AddAdminDto, AddAdminResponseDto, CompleteProfileDto, CompleteProfileResponseDto, ForgetPasswordDto, ResetPasswordDto, UpdateProfileDto, UpdateProfileResponseDto, VerifyEmailResponseDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
@@ -6,7 +6,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/common/role.enum';
 import { Roles } from 'src/auth/decorators/roles.decorator';
-import { ApiBearerAuth, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { Types } from 'mongoose';
 
@@ -25,6 +25,23 @@ export class UsersController {
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized - jwt token wrong or you arenot super admin' })
   async addAdmin(@Body() body: AddAdminDto) {
     return await this.usersService.addAdmin(body);
+  }
+
+  // users.controller.ts
+  @Get('admins')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  @ApiBearerAuth('access-token')
+  @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number, default is 1' })
+  @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page, default is 10' })
+  @ApiOperation({ summary: 'Get all admin users with pagination (SuperAdmin only)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'List of admin users' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized - jwt token invalid and superAdmin only' })
+  async getAdmins(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.usersService.getAllAdmins(Number(page), Number(limit));
   }
 
   @Post('resend-complete-profile')

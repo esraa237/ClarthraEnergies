@@ -41,6 +41,30 @@ export class UsersService {
     };
   }
 
+  // users.service.ts
+  async getAllAdmins(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const admins = await this.userModel
+      .find({ role: Role.ADMIN })
+      .select('_id email fullName userName isProfileCompleted createdAt')
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const total = await this.userModel.countDocuments({ role: Role.ADMIN });
+
+    return {
+      data: admins,
+      meta: {
+        totalAdmins: total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
   async resendProfileCompletionEmail(email: string) {
     const user = await this.findByEmail(email);
     if (user.isProfileCompleted) throw new BadRequestException(UserMessages.PROFILE_COMPLETED);
@@ -108,7 +132,7 @@ export class UsersService {
 
     return { message: UserMessages.EMAIL_VERIFIED_SUCCESSFULLY, user: { id: user._id, email: user.email } };
   }
-  
+
   // ------------------ FORGET & RESET PASSWORD ------------------ //
 
   async forgetPassword(email: string) {
