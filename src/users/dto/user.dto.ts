@@ -125,3 +125,56 @@ export class CompleteProfileResponseDto {
     @ApiProperty({ type: UserIdEmailDto })
     user: UserIdEmailDto;
 }
+export class UpdateProfileDto {
+    @ApiProperty({
+        example: 'Test User',
+        description: 'fullname for the user.'
+    })
+    @IsOptional()
+    @IsString()
+    fullName?: string;
+
+    @ApiProperty({
+        example: 'user',
+        description: 'Username.'
+    })
+    @IsOptional()
+    @IsString()
+    userName?: string;
+
+    @ApiProperty({
+        example: 'admin@example.com',
+        description: 'Email of the admin to add. Must be valid and not empty.'
+    })
+    @IsOptional()
+    @IsEmail({}, { message: 'Invalid email format' })
+    email?: string;
+
+    @ApiProperty({
+        example: 'Abc12345',
+        description: 'Password for the user. Minimum 6 characters, must include at least one letter and one number.'
+    })
+    @IsOptional()
+    @IsString()
+    @MinLength(6, { message: 'Password must be at least 6 characters long' })
+    @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]+$/, {
+        message: 'Password must contain at least one letter and one number',
+    })
+    password?: string;
+}
+
+export class UpdateProfileResponseDto {
+    @ApiProperty({ example: 'Data updated successfully, if email is changed, please verify your new email address.', description: 'Operation message' })
+    message: string;
+
+    @ApiProperty({ type: UserIdEmailDto })
+    user: UserIdEmailDto;
+}
+
+export class VerifyEmailResponseDto{
+    @ApiProperty({ example: 'Email verified successfully', description: 'Operation message' })
+    message: string;
+
+    @ApiProperty({ type: UserIdEmailDto })
+    user: UserIdEmailDto;
+}

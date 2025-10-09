@@ -27,6 +27,22 @@ export class User extends Document {
 
   @Prop()
   profileCompletionTokenExpiresAt?: Date;
+
+  @Prop()
+  newEmailPending?: string;
+
+  @Prop()
+  emailUpdateToken?: string;
+
+  @Prop()
+  emailUpdateTokenExpiresAt?: Date;
+
+  @Prop({ type: String })
+  resetPasswordToken?: string;
+
+  @Prop({ type: Date })
+  resetPasswordTokenExpiresAt?: Date;
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
