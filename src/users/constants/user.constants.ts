@@ -13,4 +13,6 @@ export const UserMessages = {
     DATA_UPDATED: 'Data updated successfully, if email is changed, please verify your new email address.',
     PASSWORD_RESET_SUCCESSFULLY: 'Password reset successfully',
     RESET_EMAIL_SENT: 'Reset password email sent successfully',
+    ADMIN_REMOVED_SUCCESSFULLY: 'Admin removed successfully',
+    NOT_AN_ADMIN: 'The selected user is not an admin',
 }

@@ -118,6 +118,18 @@ export class UsersService {
     return { message: UserMessages.DATA_UPDATED, user: { id: user._id, email: user.email } };
   }
 
+  async removeAdmin(adminId: string) {
+    const admin = await this.findById(adminId);
+
+    if (admin.role !== Role.ADMIN)
+      throw new BadRequestException(UserMessages.NOT_AN_ADMIN);
+
+    await this.userModel.deleteOne({ _id: adminId });
+
+    return { message: UserMessages.ADMIN_REMOVED_SUCCESSFULLY, userId: adminId };
+  }
+
+
   async verifyNewEmail(token: string) {
     const user = await this.userModel.findOne({ emailUpdateToken: token });
     if (!user) throw new BadRequestException(UserMessages.INVALID_TOKEN);

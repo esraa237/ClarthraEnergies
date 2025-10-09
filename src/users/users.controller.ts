@@ -1,4 +1,4 @@
-import { Controller, Post, Patch, Body, Param, UseGuards, HttpCode, HttpStatus, Query, Get } from '@nestjs/common';
+import { Controller, Post, Patch, Body, Param, UseGuards, HttpCode, HttpStatus, Query, Get, Delete } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AddAdminDto, AddAdminResponseDto, CompleteProfileDto, CompleteProfileResponseDto, ForgetPasswordDto, ResetPasswordDto, UpdateProfileDto, UpdateProfileResponseDto, VerifyEmailResponseDto } from './dto/user.dto';
 import { User } from './entities/user.entity';
@@ -6,7 +6,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/common/role.enum';
 import { Roles } from 'src/auth/decorators/roles.decorator';
-import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 import { Types } from 'mongoose';
 
@@ -83,9 +83,23 @@ export class UsersController {
     return this.usersService.updateProfile((user._id).toString(), updateData);
   }
 
+  @Delete('remove-admin/:id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Remove an admin user (SuperAdmin only)' })
+  @ApiParam({ name: 'id', description: 'Admin ID to remove' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Admin removed successfully' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Admin not found' })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'The selected user is not an admin' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized - SuperAdmin only' })
+  async removeAdmin(@Param('id') id: string) {
+    return this.usersService.removeAdmin(id);
+  }
+
   @Patch('verify-email/:token')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Verify new email using token' })
+  @ApiOperation({ summary: 'Verify new email using token - when updating email will send email and need this endpoint to verify the updated email' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Email verified successfully', type: VerifyEmailResponseDto })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Token expired or no new email to verify' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Invalid token' })
