@@ -10,6 +10,7 @@ import { RolesGuard } from './guards/roles.guard';
   imports: [
     forwardRef(() => UsersModule),
     JwtModule.register({
+      global: true,
       secret: process.env.JWT_SECRET || 'default-secret-key',
       signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '24h' },
     }),],

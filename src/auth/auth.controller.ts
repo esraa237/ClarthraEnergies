@@ -10,7 +10,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: 'Login and receive JWT token' })
   @ApiResponse({
@@ -20,7 +20,10 @@ export class AuthController {
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
-    description: 'Invalid credentials (email or password is wrong)',
+    description: `Invalid credentials or incomplete profile.
+     Possible messages: 
+      - ${AuthMessages.INVALID_CREDENTIALS}
+      - ${AuthMessages.COMPLETE_YOUR_PROFILE}`,
   })
   @HttpCode(HttpStatus.OK)
   @Post('/login')
