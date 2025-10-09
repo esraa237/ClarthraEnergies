@@ -6,6 +6,19 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  //cors configration
+  const allowedOrigins = [
+    process.env.FRONT_ADMIN_URL,
+    process.env.FRONT_WEBSITE_URL,
+  ];
+
+  app.enableCors({
+    origin: allowedOrigins,
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+  
   //swaggar init
   const config = new DocumentBuilder()
     .setTitle('My API')

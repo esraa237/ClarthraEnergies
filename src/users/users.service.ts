@@ -59,7 +59,7 @@ export class UsersService {
 
     await user.save();
 
-    const setupUrl = `${process.env.FRONTEND_URL}/setup?token=${token}`;
+    const setupUrl = `${process.env.FRONT_ADMIN_URL}/setup?token=${token}`;
     await this.sendAdminProfileSetupEmail(user, setupUrl);
 
     return {
