@@ -1,10 +1,8 @@
 import { FilesService } from '../files/file.service';
 import { Controller, Post, Body, UploadedFiles, UseInterceptors, Req, Get, HttpStatus, UseGuards } from '@nestjs/common';
-import { AnyFilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ConfigurationService } from './configuration.service';
-import { FileType } from 'src/files/contstants/file.constant';
 import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { ConfigurationDto } from './dto/configuration.dto';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
