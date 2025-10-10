@@ -129,7 +129,6 @@ export class UsersService {
     return { message: UserMessages.ADMIN_REMOVED_SUCCESSFULLY, userId: adminId };
   }
 
-
   async verifyNewEmail(token: string) {
     const user = await this.userModel.findOne({ emailUpdateToken: token });
     if (!user) throw new BadRequestException(UserMessages.INVALID_TOKEN);

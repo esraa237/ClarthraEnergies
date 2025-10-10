@@ -6,6 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
 import { SeederModule } from './seeder/seeder.module';
+import { FilesModule } from './files/file.module';
+import { ConfigurationModule } from './configuration/configuration.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { SeederModule } from './seeder/seeder.module';
     UsersModule,
     MailModule,
     SeederModule,
+    FilesModule,
+    ConfigurationModule,
   ],
   controllers: [],
   providers: [],
