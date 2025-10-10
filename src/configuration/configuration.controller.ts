@@ -58,26 +58,30 @@ export class ConfigurationController {
     description: 'Configuration created successfully',
     schema: {
       example: {
-          "configObj": {
-            "name": "My Website",
-            "main_color": "#0044ff",
-            "secondary_color": "#00ccff",
-            "contact_info": {
-              "email": "info@example.com",
-              "phone": "+20123456789"
-            }
-          },
-          "images": {
-            "main_logo": "http://localhost:3000/uploads/config/images/main_logo-1760095647492-1dac45b87edd.png",
-            "secondary_logo": "http://localhost:3000/uploads/config/images/secondary_logo-1760095647494-888df03d7146.jpeg",
-            "social_icon1": "http://localhost:3000/uploads/config/images/social_icon1-1760095647495-5b714a8ccb07.jpeg"
+        "configObj": {
+          "name": "My Website",
+          "main_color": "#0044ff",
+          "secondary_color": "#00ccff",
+          "contact_info": {
+            "email": "info@example.com",
+            "phone": "+20123456789"
           }
+        },
+        "images": {
+          "main_logo": "http://localhost:3000/uploads/config/images/main_logo-1760095647492-1dac45b87edd.png",
+          "secondary_logo": "http://localhost:3000/uploads/config/images/secondary_logo-1760095647494-888df03d7146.jpeg",
+          "social_icon1": "http://localhost:3000/uploads/config/images/social_icon1-1760095647495-5b714a8ccb07.jpeg"
+        }
       },
     }
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: 'Invalid input or file type',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized - jwt token wrong or you arenot super admin or admin'
   })
   @UseInterceptors(
     FileFieldsInterceptor([
@@ -119,13 +123,17 @@ export class ConfigurationController {
           "secondary_logo": "http://localhost:3000/uploads/config/images/secondary_logo-1760096521626-5f3f9d9ac4cb.jpeg",
           "social_icon1": "http://localhost:3000/uploads/config/images/social_icon1-1760096521633-d98e86e76ac3.webp"
         },
-        "videos": {'main_video': 'http://localhost:3000/uploads/config/videos/main_video-1760096521636-3a4f6e8c9f2b.mp4'}
+        "videos": { 'main_video': 'http://localhost:3000/uploads/config/videos/main_video-1760096521636-3a4f6e8c9f2b.mp4' }
       }
     }
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'No configuration found. Please create one.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized - jwt token wrong or you arenot super admin or admin'
   })
   async getConfig() {
     return this.configService.getConfiguration();
