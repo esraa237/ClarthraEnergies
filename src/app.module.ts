@@ -8,6 +8,7 @@ import { MailModule } from './mail/mail.module';
 import { SeederModule } from './seeder/seeder.module';
 import { FilesModule } from './files/file.module';
 import { ConfigurationModule } from './configuration/configuration.module';
+import { PagesModule } from './pages/pages.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ConfigurationModule } from './configuration/configuration.module';
     SeederModule,
     FilesModule,
     ConfigurationModule,
+    PagesModule,
   ],
   controllers: [],
   providers: [],
