@@ -69,6 +69,18 @@ export class UsersController {
     return await this.usersService.completeProfile(token, updateData);
   }
 
+  @Get('user-data')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get user profile data (admin can get his data only)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'User profile retrieved successfully' })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized - JWT token invalid' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found' })
+  async getMyData(@CurrentUser() user: User & { _id: Types.ObjectId }) {
+    return this.usersService.getMyData(user._id.toString());
+  }
+
+
   @Patch('update-profile')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth('access-token')

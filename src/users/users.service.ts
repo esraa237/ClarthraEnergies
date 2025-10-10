@@ -96,6 +96,16 @@ export class UsersService {
     return { message: UserMessages.PROFILE_COMPLETED, user: { id: user._id, email: user.email } };
   }
 
+  async getMyData(userId: string) {
+    const user = await this.userModel
+      .findById(userId)
+      .select('_id fullName userName email role isProfileCompleted createdAt');
+
+    if (!user) throw new NotFoundException(UserMessages.USER_NOT_FOUND);
+
+    return { message: UserMessages.USER_DATA_RETRIEVED, user };
+  }
+  
   async updateProfile(userId: string, updateData: UpdateProfileDto) {
     const user = await this.findById(userId);
 

@@ -15,4 +15,5 @@ export const UserMessages = {
     RESET_EMAIL_SENT: 'Reset password email sent successfully',
     ADMIN_REMOVED_SUCCESSFULLY: 'Admin removed successfully',
     NOT_AN_ADMIN: 'The selected user is not an admin',
+    USER_DATA_RETRIEVED:'User profile retrieved successfully',
 }
