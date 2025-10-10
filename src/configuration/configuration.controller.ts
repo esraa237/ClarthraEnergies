@@ -98,9 +98,6 @@ export class ConfigurationController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Get website configuration' })
   @ApiResponse({
     status: HttpStatus.OK,
