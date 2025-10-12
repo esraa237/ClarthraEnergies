@@ -8,6 +8,7 @@ import {
     Param,
     HttpStatus,
     UseGuards,
+    Query,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { PagesService } from './pages.service';
@@ -21,6 +22,7 @@ import {
     ApiResponse,
     ApiConsumes,
     ApiBody,
+    ApiQuery,
 } from '@nestjs/swagger';
 
 @Controller('/pages')
@@ -31,7 +33,7 @@ export class PagesController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.SUPER_ADMIN, Role.ADMIN)
     @ApiBearerAuth('access-token')
-    @ApiOperation({ summary: 'Create or update page content' })
+    @ApiOperation({ summary: 'Create or update page content (only admins)' })
     @ApiConsumes('multipart/form-data')
     @ApiBody({
         schema: {
@@ -193,6 +195,70 @@ export class PagesController {
     ) {
         return this.pageService.createOrUpdate(data, files);
     }
+    @Get('')
+    @ApiOperation({ summary: 'Get all pages with pagination (full data)' })
+    @ApiQuery({
+        name: 'page',
+        required: false,
+        example: 1,
+        description: 'Page number (default = 1)',
+    })
+    @ApiQuery({
+        name: 'limit',
+        required: false,
+        example: 10,
+        description: 'Number of items per page (default = 10)',
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Paginated list of pages',
+        schema: {
+            example: {
+                totalPages: 2,
+                currentPage: 1,
+                totalItems: 12,
+                itemsPerPage: 10,
+                data: [
+                    {
+                        _id: '6710a4c...',
+                        title: 'home',
+                        data: {
+                            pageObj: { hero_section: { title: 'Welcome' } },
+                            images: { home_hero_image: 'http://localhost:3000/uploads/pages/home/images/...' },
+                        },
+                    },
+                ],
+            },
+        },
+    })
+    async getAllPagesPaginated(
+        @Query('page') page = 1,
+        @Query('limit') limit = 10,
+    ) {
+        return this.pageService.getAllPagesPaginated(+page, +limit);
+    }
+
+    @Get('/all-titles')
+    @ApiOperation({ summary: 'Get all page titles and ids' })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'List of all available pages',
+        schema: {
+            example: [
+                {
+                    "_id": "68e98f6da205c6......",
+                    "title": "home"
+                },
+                {
+                    "_id": "68sdfffdggfds6......",
+                    "title": "about-us"
+                },
+            ],
+        },
+    })
+    async getAllPages() {
+        return this.pageService.getAllPages();
+    }
 
     @Get(':title')
     @ApiOperation({ summary: 'Get specific page content' })
@@ -248,25 +314,4 @@ export class PagesController {
         return this.pageService.getPage(title);
     }
 
-    @Get()
-    @ApiOperation({ summary: 'Get all page titles and ids' })
-    @ApiResponse({
-        status: HttpStatus.OK,
-        description: 'List of all available pages',
-        schema: {
-            example: [
-                {
-                    "_id": "68e98f6da205c6......",
-                    "title": "home"
-                },
-                {
-                    "_id": "68sdfffdggfds6......",
-                    "title": "about-us"
-                },
-            ],
-        },
-    })
-    async getAllPages() {
-        return this.pageService.getAllPages();
-    }
 }

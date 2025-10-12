@@ -68,4 +68,24 @@ export class PagesService {
         return pages;
     }
 
+    async getAllPagesPaginated(page = 1, limit = 10) {
+        const skip = (page - 1) * limit;
+
+        const [pages, total] = await Promise.all([
+            this.pageModel.find()
+                .select('title data.pageObj data.images')
+                .skip(skip)
+                .limit(limit)
+                .exec(),
+            this.pageModel.countDocuments(),
+        ]);
+
+        return {
+            totalPages: Math.ceil(total / limit),
+            currentPage: page,
+            totalItems: total,
+            itemsPerPage: limit,
+            data: pages,
+        };
+    }
 }

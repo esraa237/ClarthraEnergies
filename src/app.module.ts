@@ -12,6 +12,8 @@ import { PagesModule } from './pages/pages.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { FILE_CONSTANTS } from './files/contstants/file.constant';
+import { ServicesController } from './services/services.controller';
+import { ServicesModule } from './services/services.module';
 
 @Module({
   imports: [
@@ -32,6 +34,7 @@ import { FILE_CONSTANTS } from './files/contstants/file.constant';
         index: false, 
       },
     }),
+    ServicesModule,
   ],
   controllers: [],
   providers: [],
