@@ -13,9 +13,9 @@ export class ConfigurationController {
   constructor(private readonly configService: ConfigurationService, private readonly filesService: FilesService) { }
 
   @Post('/add-or-update')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  @ApiBearerAuth('access-token')
+  // @UseGuards(JwtAuthGuard, RolesGuard)
+  // @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  // @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Create or update website configuration' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
