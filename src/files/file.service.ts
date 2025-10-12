@@ -114,7 +114,6 @@ export class FilesService {
         return;
       }
 
-      console.log("delete")
       const host = process.env.HOST_URL || '';
       const relativePath = fileUrl.replace(`${host}/`, '')
         .replace(`${FILE_CONSTANTS.UPLOAD_DIR}/`, '') // remove base upload dir
@@ -123,7 +122,6 @@ export class FilesService {
 
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
-        console.log(`Deleted file: ${filePath}`);
       }
     } catch (err) {
       console.error('Error deleting file:', err);
