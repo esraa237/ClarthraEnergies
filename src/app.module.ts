@@ -14,6 +14,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { FILE_CONSTANTS } from './files/contstants/file.constant';
 import { ServicesController } from './services/services.controller';
 import { ServicesModule } from './services/services.module';
+import { ContactUsModule } from './contact-us/contact-us.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { ServicesModule } from './services/services.module';
       },
     }),
     ServicesModule,
+    ContactUsModule,
   ],
   controllers: [],
   providers: [],
