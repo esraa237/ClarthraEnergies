@@ -14,7 +14,14 @@ export class PagesService {
         private readonly filesService: FilesService,
     ) { }
 
-    async createOrUpdate(data: string | Record<string, any>, files: Record<string, Express.Multer.File[]>) {
+    async createOrUpdate(data: string | Record<string, any>, filesArray: Express.Multer.File[]) {
+        // Restructure files array into a map
+        const files: Record<string, Express.Multer.File[]> = {};
+        for (const file of filesArray) {
+            if (!files[file.fieldname]) files[file.fieldname] = [];
+            files[file.fieldname].push(file);
+        }
+
         // Parse body data
         let parsedData = typeof data === 'string' ? JSON.parse(data) : data;
         if (parsedData.data) parsedData = JSON.parse(parsedData.data);

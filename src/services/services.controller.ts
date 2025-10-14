@@ -135,7 +135,7 @@ export class ServicesController {
     AnyFilesInterceptor()
   )
   async createOrUpdateService(
-    @UploadedFiles() files: Record<string, Express.Multer.File[]>,
+    @UploadedFiles() files:  Express.Multer.File[],
     @Body() data: string | Record<string, any>,
   ) {
     return this.servicesService.createOrUpdate(data, files);

@@ -185,7 +185,7 @@ export class PagesController {
         AnyFilesInterceptor()
     )
     async createOrUpdatePage(
-        @UploadedFiles() files: Record<string, Express.Multer.File[]>,
+        @UploadedFiles() files: Express.Multer.File[],
         @Body() data: string | Record<string, any>,
     ) {
         return this.pageService.createOrUpdate(data, files);
