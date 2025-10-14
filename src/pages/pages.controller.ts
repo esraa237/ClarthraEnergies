@@ -10,7 +10,7 @@ import {
     UseGuards,
     Query,
 } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
 import { PagesService } from './pages.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -182,12 +182,7 @@ export class PagesController {
         description: 'Unauthorized - jwt token wrong or you arenot super admin or admin'
     })
     @UseInterceptors(
-        FileFieldsInterceptor([
-            { name: 'home_hero_image', maxCount: 1 },
-            { name: 'home_about_image', maxCount: 1 },
-            { name: 'home_section_image1', maxCount: 1 },
-            { name: 'home_section_image2', maxCount: 1 },
-        ]),
+        AnyFilesInterceptor()
     )
     async createOrUpdatePage(
         @UploadedFiles() files: Record<string, Express.Multer.File[]>,

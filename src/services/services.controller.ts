@@ -10,7 +10,7 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { FileFieldsInterceptor } from '@nestjs/platform-express';
+import { AnyFilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ServicesService } from './services.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -30,9 +30,9 @@ export class ServicesController {
   constructor(private readonly servicesService: ServicesService) { }
 
   @Post('/add-or-update')
-  // @UseGuards(JwtAuthGuard, RolesGuard)
-  // @Roles(Role.SUPER_ADMIN, Role.ADMIN)
-  // @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @ApiBearerAuth('access-token')
   @ApiOperation({ summary: 'Create or update a service page (only admins)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -132,11 +132,7 @@ export class ServicesController {
     description: 'Forbidden - only admins can perform this action.',
   })
   @UseInterceptors(
-    FileFieldsInterceptor([
-      { name: 'service-image', maxCount: 1 },
-      { name: 'serviceName-details-icon-1', maxCount: 1 },
-      { name: 'serviceName-details-icon-2', maxCount: 1 },
-    ]),
+    AnyFilesInterceptor()
   )
   async createOrUpdateService(
     @UploadedFiles() files: Record<string, Express.Multer.File[]>,
@@ -261,5 +257,4 @@ export class ServicesController {
   async getService(@Param('title') title: string) {
     return this.servicesService.getService(title);
   }
-
 }
