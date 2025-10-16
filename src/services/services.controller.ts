@@ -9,6 +9,7 @@ import {
   HttpStatus,
   UseGuards,
   Query,
+  Delete,
 } from '@nestjs/common';
 import { AnyFilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
 import { ServicesService } from './services.service';
@@ -135,7 +136,7 @@ export class ServicesController {
     AnyFilesInterceptor()
   )
   async createOrUpdateService(
-    @UploadedFiles() files:  Express.Multer.File[],
+    @UploadedFiles() files: Express.Multer.File[],
     @Body() data: string | Record<string, any>,
   ) {
     return this.servicesService.createOrUpdate(data, files);
@@ -256,5 +257,16 @@ export class ServicesController {
   })
   async getService(@Param('title') title: string) {
     return this.servicesService.getService(title);
+  }
+
+  @Delete(':title')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Delete a service by title (for Admin only)' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Service deleted successfully' })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Service not found' })
+  async deleteService(@Param('title') title: string) {
+    return this.servicesService.deleteService(title);
   }
 }

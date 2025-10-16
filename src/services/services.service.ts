@@ -24,7 +24,7 @@ export class ServicesService {
       if (!files[file.fieldname]) files[file.fieldname] = [];
       files[file.fieldname].push(file);
     }
-    
+
     // Parse body
     let parsedData = typeof data === 'string' ? JSON.parse(data) : data;
     if (parsedData.data) parsedData = JSON.parse(parsedData.data);
@@ -104,5 +104,24 @@ export class ServicesService {
       services,
     };
   }
+
+  async deleteService(title: string) {
+    const service = await this.serviceModel.findOne({ title });
+    if (!service) {
+      throw new NotFoundException(`Service '${title}' not found`);
+    }
+
+    // Delete any associated files (e.g., images)
+    if (service.data?.images) {
+      const imageUrls = Object.values(service.data.images);
+      for (const url of imageUrls) {
+        await this.filesService.deleteFileByUrl(url);
+      }
+    }
+
+    await this.serviceModel.deleteOne({ _id: service._id });
+    return { message: `Service '${title}' deleted successfully` };
+  }
+
 
 }
