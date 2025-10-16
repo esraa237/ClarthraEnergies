@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
-import { TestModule } from './test/test.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { MailModule } from './mail/mail.module';
@@ -12,7 +11,6 @@ import { PagesModule } from './pages/pages.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { FILE_CONSTANTS } from './files/contstants/file.constant';
-import { ServicesController } from './services/services.controller';
 import { ServicesModule } from './services/services.module';
 import { ContactUsModule } from './contact-us/contact-us.module';
 import { PositionsModule } from './positions/positions.module';
@@ -21,7 +19,6 @@ import { PositionsModule } from './positions/positions.module';
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     MongooseModule.forRoot(process.env.MONGO_URL || 'mongodb://localhost:27017/mydb'),
-    // TestModule,
     AuthModule,
     UsersModule,
     MailModule,

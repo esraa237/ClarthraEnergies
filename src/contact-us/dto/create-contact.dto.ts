@@ -1,6 +1,6 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
-import { IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform, Type } from 'class-transformer';
+import { IsBoolean, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateContactDto {
     @ApiProperty()
@@ -35,7 +35,7 @@ export class CreateContactDto {
 }
 
 export class PaginationQueryDto {
-    @ApiProperty({
+    @ApiPropertyOptional({
         description: 'Page number (must be ≥ 1)',
         required: false,
         example: 1,
@@ -47,7 +47,7 @@ export class PaginationQueryDto {
     @Min(1)
     page?: number = 1;
 
-    @ApiProperty({
+    @ApiPropertyOptional({
         description: 'Number of items per page (must be ≥ 1)',
         required: false,
         example: 10,
@@ -58,4 +58,24 @@ export class PaginationQueryDto {
     @IsInt()
     @Min(1)
     limit?: number = 10;
+
+    @ApiPropertyOptional({
+        description:
+            'Filter by read status (true = read, false = unread). If omitted, all contacts are returned.',
+        example: false,
+    })
+    @IsOptional()
+    @Transform(({ value }) => value === 'true' || value === true)
+    @IsBoolean()
+    isRead?: boolean;
+}
+
+export class UpdateReadStatusDto {
+    @ApiProperty({
+        description: 'Mark contact as read (true) or unread (false)',
+        example: true,
+    })
+    @Transform(({ value }) => value === 'true' || value === true)
+    @IsBoolean()
+    isRead: boolean;
 }

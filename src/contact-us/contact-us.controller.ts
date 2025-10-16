@@ -1,6 +1,6 @@
-import { Controller, Post, Body, Get, HttpStatus, Query, UseGuards } from '@nestjs/common';
-import { CreateContactDto, PaginationQueryDto } from './dto/create-contact.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Post, Body, Get, HttpStatus, Query, UseGuards, Param, Patch } from '@nestjs/common';
+import { CreateContactDto, PaginationQueryDto, UpdateReadStatusDto } from './dto/create-contact.dto';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiQuery, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { ContactUsService } from './contact-us.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -79,6 +79,13 @@ export class ContactUsController {
         example: 10,
         description: 'Number of items per page (default: 10)',
     })
+    @ApiQuery({
+        name: 'isRead',
+        required: false,
+        type: Boolean,
+        example: false,
+        description: 'Filter by read status (true = read, false = unread). If not provided, all contacts are returned.',
+    })
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'List of contacts retrieved successfully.',
@@ -95,6 +102,9 @@ export class ContactUsController {
                                     organization: 'Tech Hub',
                                     email: 'esraa@example.com',
                                     areaOfInterest: 'Web Development',
+                                    representation: "i represent...",
+                                    message: "i want ....",
+                                    isRead: true,
                                     createdAt: '2025-10-14T20:05:30.000Z',
                                 },
                             ],
@@ -115,6 +125,36 @@ export class ContactUsController {
         },
     })
     async getAll(@Query() query: PaginationQueryDto) {
-        return await this.contactService.getAllContacts(query.page, query.limit);
+        console.log('Received query:', query);
+        return await this.contactService.getAllContacts(query.page, query.limit, query.isRead);
+    }
+
+    @Patch(':id/read-status')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+    @ApiBearerAuth('access-token')
+    @ApiOperation({ summary: 'Update read/unread status for a contact (Admins only)' })
+    @ApiParam({ name: 'id', description: 'Contact ID' })
+    @ApiBody({ type: UpdateReadStatusDto })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Contact read status updated successfully.',
+        schema: {
+            example: {
+                message: 'Contact marked as read',
+                contact: {
+                    _id: '671081fe9a4bff91dce8f3c2',
+                    fullName: 'Esraa Foda',
+                    email: 'esraa@example.com',
+                    isRead: true,
+                },
+            },
+        },
+    })
+    async updateReadStatus(
+        @Param('id') id: string,
+        @Body() updateDto: UpdateReadStatusDto,
+    ) {
+        return this.contactService.updateReadStatus(id, updateDto);
     }
 }

@@ -20,6 +20,9 @@ export class Contact extends Document {
 
   @Prop({ required: true })
   message: string;
+
+  @Prop({ default: false })
+  isRead: boolean;
 }
 
 export const ContactSchema = SchemaFactory.createForClass(Contact);
