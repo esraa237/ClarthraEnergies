@@ -14,6 +14,7 @@ import { FILE_CONSTANTS } from './files/contstants/file.constant';
 import { ServicesModule } from './services/services.module';
 import { ContactUsModule } from './contact-us/contact-us.module';
 import { PositionsModule } from './positions/positions.module';
+import { ApplicationsModule } from './applications/applications.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { PositionsModule } from './positions/positions.module';
     ServicesModule,
     ContactUsModule,
     PositionsModule,
+    ApplicationsModule,
   ],
   controllers: [],
   providers: [],
