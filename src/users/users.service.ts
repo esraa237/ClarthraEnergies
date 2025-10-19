@@ -105,7 +105,7 @@ export class UsersService {
 
     return { message: UserMessages.USER_DATA_RETRIEVED, user };
   }
-  
+
   async updateProfile(userId: string, updateData: UpdateProfileDto) {
     const user = await this.findById(userId);
 
@@ -231,9 +231,14 @@ export class UsersService {
   }
 
   private buildUrl(path: string, token: string, isFrontAdmin: boolean = false) {
-    const base = isFrontAdmin ? process.env.FRONT_ADMIN_URL : process.env.FRONTEND_URL;
-    return `${base}${path}?token=${token}`;
+    const base =
+      (isFrontAdmin ? process.env.FRONT_ADMIN_URL : process.env.FRONTEND_URL) ||
+      '';
+
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+    return `${base}${normalizedPath}?token=${token}`;
   }
+
 
   private async ensureEmailNotDuplicate(email: string, isProfileEmail: boolean = false) {
     const existingUser = await this.userModel.findOne({ email });
