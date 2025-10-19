@@ -14,6 +14,12 @@ export class FilesService {
     video: (process.env.ALLOWED_VIDEO_EXTENSIONS || '.mp4,.mov').split(','),
     file: (process.env.ALLOWED_FILE_EXTENSIONS || '.pdf,.doc,.docx').split(','),
   }
+  private MAX_SIZES = {
+    image: parseInt(process.env.MAX_IMAGE_SIZE || '5242880', 10),
+    video: parseInt(process.env.MAX_VIDEO_SIZE || '20971520', 10),
+    file: parseInt(process.env.MAX_FILE_SIZE || '10485760', 10),
+  }
+
   async saveFiles(
     files: Express.Multer.File[] | Express.Multer.File,
     folder: string,
@@ -87,7 +93,7 @@ export class FilesService {
     if (!file) throw new BadRequestException(FILE_CONSTANTS.MESSAGES.NO_FILE);
 
     const { mimetype, size, originalname } = file;
-    const maxSize = FILE_CONSTANTS.MAX_SIZES[type];
+    const maxSize = this.MAX_SIZES[type];
     const allowedExts = this.ALLOWED_EXTENSIONS[type].map(e => e.toLowerCase());
     const fileExt = this.getExtension(originalname).toLowerCase();
 

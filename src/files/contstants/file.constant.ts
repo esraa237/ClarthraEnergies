@@ -1,12 +1,6 @@
 export const FILE_CONSTANTS = {
     UPLOAD_DIR: process.env.UPLOAD_DIR || 'uploads',
 
-    MAX_SIZES: {
-        image: parseInt(process.env.MAX_IMAGE_SIZE || '5242880', 10),
-        video: parseInt(process.env.MAX_VIDEO_SIZE || '20971520', 10),
-        file: parseInt(process.env.MAX_FILE_SIZE || '10485760', 10),
-    },
-
     MESSAGES: {
         NO_FILE: 'No file provided',
         INVALID_TYPE: {
