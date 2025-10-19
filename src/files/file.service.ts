@@ -101,7 +101,7 @@ export class FilesService {
       throw new BadRequestException(FILE_CONSTANTS.MESSAGES.INVALID_TYPE.image);
     if (type === FileType.VIDEO && !mimetype.startsWith('video/'))
       throw new BadRequestException(FILE_CONSTANTS.MESSAGES.INVALID_TYPE.video);
-    if (type === FileType.FILE && (mimetype.startsWith('image/') || mimetype.startsWith('video/')))
+    if (type === FileType.FILE && mimetype.startsWith('video/'))
       throw new BadRequestException(FILE_CONSTANTS.MESSAGES.INVALID_TYPE.file);
 
     if (!allowedExts.includes(fileExt))
