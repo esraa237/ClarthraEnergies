@@ -4,17 +4,26 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateContactDto, UpdateReadStatusDto } from './dto/create-contact.dto';
 import { Contact } from './entities/contact-us.entity';
+import { MailService } from 'src/mail/mail.service';
+import { contactUsTemplate } from 'src/mail/contact-us-template';
 
 @Injectable()
 export class ContactUsService {
     constructor(
         @InjectModel(Contact.name) private contactModel: Model<Contact>,
+        private readonly mailService: MailService
     ) { }
 
     async createContact(data: CreateContactDto) {
         try {
             const newContact = new this.contactModel(data);
-            return newContact.save();
+            const savedContact = await newContact.save();
+
+            await this.sendContactEmail(savedContact);
+            return {
+                message: 'Your message has been sent successfully.',
+                data: savedContact,
+            };
         } catch (error) {
             throw new InternalServerErrorException(
                 'Internal server error. Please try again later.',
@@ -137,4 +146,26 @@ export class ContactUsService {
         }
     }
 
+    private async sendContactEmail(contact: Contact) {
+        try {
+            const { html, plainText } = contactUsTemplate({
+                fullName: contact.fullName,
+                organization: contact.organization,
+                email: contact.email,
+                areaOfInterest: contact.areaOfInterest,
+                representation: contact.representation,
+                message: contact.message,
+            });
+
+            await this.mailService.sendEmail({
+                to: process.env.CONTACT_RECEIVER_EMAIL || 'admin@yourcompany.com',
+                subject: `📩 New Contact Message from ${contact.fullName}`,
+                text: plainText,
+                html,
+            });
+        } catch (error) {
+            console.error('Error sending contact email:', error);
+            throw new InternalServerErrorException('Failed to send contact message');
+        }
+    }
 }
