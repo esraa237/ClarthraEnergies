@@ -145,6 +145,62 @@ export class ApplicationsController {
     return this.appService.getAll(+page, +limit, status, positionId);
   }
 
+  @Get('/statistics')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Get detailed applications statistics (Admins only)' })
+  @ApiQuery({
+    name: 'year',
+    required: false,
+    example: 2025,
+    description: 'Filter by year (e.g. 2025)',
+  })
+  @ApiQuery({
+    name: 'month',
+    required: false,
+    example: 10,
+    description: 'Filter by month number (1–12). Note: requires "year" query parameter to be provided as well.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Comprehensive applications statistics summary',
+    schema: {
+      example: {
+        summary: {
+          totalApplications: 120,
+          thisMonthCount: 15,
+        },
+        monthlyDistribution: [
+          { year: 2025, month: 'Sep', count: 10 },
+          { year: 2025, month: 'Oct', count: 15 },
+        ],
+        filteredMonth: {
+          year: 2025,
+          month: 'Oct',
+          count: 15,
+        },
+        byPosition: [
+          { position: 'Frontend Developer', count: 25 },
+          { position: 'Backend Developer', count: 18 },
+          { position: 'UI/UX Designer', count: 7 },
+          { position: 'No position', count: 3 },
+        ],
+      },
+    },
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: 'Failed to retrieve applications statistics',
+  })
+  async getApplicationsStatistics(
+    @Query('year') year?: number,
+    @Query('month') month?: number,
+  ) {
+    return this.appService.getApplicationsStatistics(year, month);
+  }
+
+
   @Get(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
@@ -232,4 +288,5 @@ export class ApplicationsController {
   ) {
     return this.appService.updateStatus(id, status);
   }
+
 }

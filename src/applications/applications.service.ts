@@ -152,4 +152,92 @@ export class ApplicationsService {
     return { message: `Application status updated to '${status}'`, application };
   }
 
+  async getApplicationsStatistics(year?: number, month?: number): Promise<any> {
+    try {
+      const totalApplications = await this.applicationModel.countDocuments();
+
+      const monthlyStats = await this.applicationModel.aggregate([
+        {
+          $group: {
+            _id: {
+              year: { $year: '$createdAt' },
+              month: { $month: '$createdAt' },
+            },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { '_id.year': 1, '_id.month': 1 } },
+      ]);
+
+      const monthNames = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      ];
+
+      const monthlyDistribution = monthlyStats.map((item) => ({
+        year: item._id.year,
+        month: monthNames[item._id.month - 1],
+        count: item.count,
+      }));
+
+      let filteredMonth: any = null;
+      if (year && month) {
+        const startDate = new Date(year, month - 1, 1);
+        const endDate = new Date(year, month, 1);
+
+        const count = await this.applicationModel.countDocuments({
+          createdAt: { $gte: startDate, $lt: endDate },
+        });
+
+        filteredMonth = {
+          year,
+          month: monthNames[month - 1],
+          count,
+        };
+      }
+
+      const now = new Date();
+      const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+      const thisMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+      const thisMonthCount = await this.applicationModel.countDocuments({
+        createdAt: { $gte: thisMonthStart, $lt: thisMonthEnd },
+      });
+
+      const byPosition = await this.applicationModel.aggregate([
+        {
+          $lookup: {
+            from: 'positions',
+            localField: 'positionId',
+            foreignField: '_id',
+            as: 'position',
+          },
+        },
+        { $unwind: { path: '$position', preserveNullAndEmptyArrays: true } },
+        {
+          $group: {
+            _id: '$position.name',
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { count: -1 } },
+      ]);
+
+      const positionDistribution = byPosition.map((p) => ({
+        position: p._id || 'No position',
+        count: p.count,
+      }));
+
+      return {
+        summary: {
+          totalApplications,
+          thisMonthCount,
+        },
+        monthlyDistribution,
+        filteredMonth,
+        byPosition: positionDistribution,
+      };
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to retrieve applications statistics');
+    }
+  }
 }
