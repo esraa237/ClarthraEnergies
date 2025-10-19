@@ -129,6 +129,53 @@ export class ContactUsController {
         return await this.contactService.getAllContacts(query.page, query.limit, query.isRead);
     }
 
+    @Get('/statistics')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+    @ApiBearerAuth('access-token')
+    @ApiOperation({ summary: 'Get contact form statistics (Admins only)' })
+    @ApiQuery({
+        name: 'year',
+        required: false,
+        example: 2025,
+        description: 'Filter by year (e.g. 2025)',
+    })
+    @ApiQuery({
+        name: 'month',
+        required: false,
+        example: 10,
+        description:
+            'Filter by month number (1–12). Note: requires "year" query parameter to be provided as well.',
+    })
+    @ApiResponse({
+        status: HttpStatus.OK,
+        description: 'Contact statistics summary',
+        schema: {
+            example: {
+                summary: {
+                    totalContacts: 45,
+                    readCount: 30,
+                    unreadCount: 15,
+                },
+                monthlyDistribution: [
+                    { year: 2025, month: 9, count: 10 },
+                    { year: 2025, month: 10, count: 5 },
+                ],
+                selectedMonth: {
+                    year: 2025,
+                    month: 10,
+                    contactsCount: 5,
+                },
+            },
+        },
+    })
+    async getContactStatistics(
+        @Query('year') year?: number,
+        @Query('month') month?: number,
+    ) {
+        return this.contactService.getContactStatistics(year, month);
+    }
+
     @Patch(':id/read-status')
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.SUPER_ADMIN, Role.ADMIN)
