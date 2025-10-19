@@ -1,10 +1,11 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { isValidObjectId, Model } from 'mongoose';
 import { ApplicationDataDto } from './dto/application.dto';
 import { FileType } from 'src/files/contstants/file.constant';
 import { FilesService } from 'src/files/file.service';
 import { Application } from './entities/application.entity';
+import { Position } from 'src/positions/entities/position.entity';
 
 @Injectable()
 export class ApplicationsService {
@@ -12,9 +13,24 @@ export class ApplicationsService {
     @InjectModel(Application.name)
     private readonly applicationModel: Model<Application>,
     private readonly filesService: FilesService,
+    @InjectModel(Position.name)
+    private readonly positionModel: Model<Position>,
   ) { }
 
   async create(body: ApplicationDataDto, files: Record<string, Express.Multer.File[]>) {
+    let positionId: null | string = null;
+    if (body.positionId) {
+      if (!isValidObjectId(body.positionId)) {
+        throw new BadRequestException('Invalid position ID format');
+      }
+
+      const positionExists = await this.positionModel.exists({ _id: body.positionId });
+      if (!positionExists) {
+        throw new BadRequestException('Position not found');
+      }
+
+      positionId = body.positionId;
+    }
     const fileMap: Record<string, Express.Multer.File> = {};
     for (const key in files) {
       if (files[key] && files[key][0]) {
@@ -30,6 +46,7 @@ export class ApplicationsService {
 
     const created = await this.applicationModel.create({
       ...body,
+      positionId,
       files: {
         cv: savedFiles.cv || null,
         coverLetter: savedFiles.coverLetter || null,
@@ -46,32 +63,65 @@ export class ApplicationsService {
   }
 
 
-  async getAll(page = 1, limit = 10, status?: 'pending' | 'approved' | 'rejected' | 'contacted',) {
+  async getAll(page = 1, limit = 10, status?: 'pending' | 'approved' | 'rejected' | 'contacted', positionId?: string): Promise<{
+    totalItems: number;
+    totalPages: number;
+    currentPage: number;
+    data: any[];
+  }> {
     const skip = (page - 1) * limit;
     const filter: any = {};
     if (status) filter.status = status;
+    if (positionId === 'none') {
+      filter.positionId = { $exists: false };
+    } else if (positionId) {
+      filter.positionId = positionId;
+    }
 
     const total = await this.applicationModel.countDocuments(filter);
     const applications = await this.applicationModel
       .find(filter)
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'positionId',
+        select: 'name location type',
+        options: { retainNullValues: true },
+      })
+      .lean();
+
+    const data = applications.map(({ positionId, ...rest }) => ({
+      ...rest,
+      position: positionId || null,
+    }));
 
     return {
       totalItems: total,
       totalPages: Math.ceil(total / limit),
       currentPage: page,
-      data: applications,
+      data: data,
     };
   }
 
   async getById(id: string) {
     const application = await this.applicationModel.findOne({
       _id: id,
-    });
+    })
+      .populate({
+        path: 'positionId',
+        select: 'name location type',
+        options: { retainNullValues: true },
+      }).lean();
+
     if (!application) throw new BadRequestException('No application found for this ');
-    return application;
+    const data = {
+      ...application,
+      position: application.positionId || null,
+    };
+
+    delete data.positionId;
+    return data;
   }
 
   async deleteById(id: string) {

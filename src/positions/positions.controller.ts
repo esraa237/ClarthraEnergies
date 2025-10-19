@@ -12,7 +12,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { PositionsService } from './positions.service';
-import { CreatePositionDto, PaginatedPositionsResponseDto, PaginationDto } from './dto/position.dto';
+import { CreatePositionDto, PaginatedPositionsResponseDto, PaginationDto, PositionWithApplicationsDto } from './dto/position.dto';
 import {
   ApiTags,
   ApiQuery,
@@ -73,7 +73,7 @@ export class PositionsController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Get a position by ID.',
-    type: Position,
+    type: PositionWithApplicationsDto,
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid ID format.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Position not found.' })
@@ -111,7 +111,7 @@ export class PositionsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Delete a position by ID (for Admin only)' })
+  @ApiOperation({ summary: 'Delete a position and related applications by ID (for Admin only)' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Position deleted successfully.',

@@ -49,10 +49,16 @@ export class ApplicationDataDto {
   @Type(() => Number)
   @IsNumber()
   expectedSalary?: number;
+
+  @ApiPropertyOptional({
+    example: '68f29ebf9adc2a84b3d12682',
+    description: 'Optional ID of the related position',
+  })
+  @IsOptional()
+  positionId: string;
 }
 
-export class CreateApplicationDto extends ApplicationDataDto{
-
+export class CreateApplicationDto extends ApplicationDataDto {
   @ApiProperty({ type: 'string', format: 'binary', required: true })
   cv: string;
 

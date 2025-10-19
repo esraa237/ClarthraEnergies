@@ -70,6 +70,38 @@ export class PositionResponseDto {
   message: string;
 }
 
+export class ApplicationSummaryDto {
+  @ApiProperty({ example: '6710a4c3f0b8b5f0a0a12345' })
+  _id: string;
+
+  @ApiProperty({ example: 'John' })
+  firstName: string;
+
+  @ApiProperty({ example: 'Doe' })
+  lastName: string;
+
+  @ApiProperty({ example: 'john@example.com' })
+  email: string;
+
+  @ApiProperty({ example: 'pending', enum: ['pending', 'approved', 'rejected', 'contacted'] })
+  status: string;
+
+  @ApiProperty({ example: '2025-10-16T12:00:00.000Z' })
+  createdAt: Date;
+}
+
+// 🔹 Position Response with applicationsCount + applications
+export class PositionWithApplicationsDto extends Position {
+  @ApiProperty({ example: 5, description: 'Number of applications related to this position' })
+  applicationsCount: number;
+
+  @ApiProperty({
+    type: [ApplicationSummaryDto],
+    description: 'List of applications related to this position',
+  })
+  applications: ApplicationSummaryDto[];
+}
+
 export class PaginatedPositionsResponseDto {
   @ApiProperty({ example: 25 })
   total: number;
@@ -83,6 +115,6 @@ export class PaginatedPositionsResponseDto {
   @ApiProperty({ example: 3 })
   totalPages: number;
 
-  @ApiProperty({ type: [Position] })
-  data: Position[];
+  @ApiProperty({ type: [PositionWithApplicationsDto] })
+  data: PositionWithApplicationsDto[];
 }

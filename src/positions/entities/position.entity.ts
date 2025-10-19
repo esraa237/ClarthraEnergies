@@ -38,3 +38,10 @@ export class Position extends Document {
 }
 
 export const PositionSchema = SchemaFactory.createForClass(Position);
+
+// Virtual field to populate related applications
+PositionSchema.virtual('applications', {
+  ref: 'Application',
+  localField: '_id',
+  foreignField: 'positionId',
+});

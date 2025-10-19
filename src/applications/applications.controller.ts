@@ -60,6 +60,7 @@ export class ApplicationsController {
             certificate: null,
             other: null,
           },
+          positionId: "68f29ebf9adc2a84b3d12682",
           status: 'pending',
           createdAt: '2025-10-16T12:00:00.000Z',
         },
@@ -92,6 +93,11 @@ export class ApplicationsController {
   @ApiQuery({ name: 'page', required: false, example: 1, description: 'Page number' })
   @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Number of records per page' })
   @ApiQuery({
+    name: 'positionId', required: false, example: "68f291da9adc2a84b3d1266d", description: `Filter applications by related position.
+- Leave empty → returns all applications
+- Send a specific Position ID → returns only applications linked to that position
+- Send 'none' → returns applications with **no position assigned**` })
+  @ApiQuery({
     name: 'status',
     required: false,
     enum: ['pending', 'approved', 'rejected', 'contacted'],
@@ -122,6 +128,12 @@ export class ApplicationsController {
               other: null,
             },
             status: 'pending',
+            position: {
+              "_id": "68f29ebf9adc2a84b3d12682",
+              "name": "job",
+              "location": "Egypt",
+              "type": "Full-time"
+            },
             createdAt: '2025-10-16T12:00:00.000Z',
           },
         ],
@@ -129,8 +141,8 @@ export class ApplicationsController {
     },
   })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Unexpected server error' })
-  async getAll(@Query('page') page = 1, @Query('limit') limit = 10, @Query('status') status?: 'pending' | 'approved' | 'rejected' | 'contacted',) {
-    return this.appService.getAll(+page, +limit, status);
+  async getAll(@Query('page') page = 1, @Query('limit') limit = 10, @Query('status') status?: 'pending' | 'approved' | 'rejected' | 'contacted', @Query('positionId') positionId?: string): Promise<any> {
+    return this.appService.getAll(+page, +limit, status, positionId);
   }
 
   @Get(':id')
@@ -157,6 +169,12 @@ export class ApplicationsController {
           employeeReference: null,
           certificate: null,
           other: null,
+        },
+        position: {
+          "_id": "68f29ebf9adc2a84b3d12682",
+          "name": "job",
+          "location": "Egypt",
+          "type": "Full-time"
         },
         status: 'pending',
         createdAt: '2025-10-16T12:00:00.000Z',

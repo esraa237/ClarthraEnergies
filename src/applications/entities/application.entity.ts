@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { ApiPropertyOptional } from '@nestjs/swagger';
+import { Document, Types } from 'mongoose';
+import { Position } from 'src/positions/entities/position.entity';
 
 @Schema({ timestamps: true })
 export class Application extends Document {
@@ -29,6 +31,9 @@ export class Application extends Document {
 
     @Prop({ default: 'pending' })
     status: 'pending' | 'approved' | 'rejected' | 'contacted';
+
+    @Prop({ type: Types.ObjectId, ref: 'Position', required: false })
+    positionId?: Position | Types.ObjectId;
 }
 
 
