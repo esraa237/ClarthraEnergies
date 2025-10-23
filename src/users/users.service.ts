@@ -32,7 +32,7 @@ export class UsersService {
       profileCompletionTokenExpiresAt: expiresAt,
     });
 
-    const setupUrl = this.buildUrl('/setup', token);
+    const setupUrl = this.buildUrl('/setup', token, true);
     await this.sendEmail(admin.email, 'Account Setup Invitation', `Hello ${admin.fullName || admin.userName || 'User'},`, setupUrl, 'Complete Account Setup');
 
     return {
@@ -165,7 +165,7 @@ export class UsersService {
 
     await user.save();
 
-    const resetUrl = this.buildUrl('/reset-password', token);
+    const resetUrl = this.buildUrl('/reset-password', token, true);
     await this.sendEmail(user.email, 'Reset Your Password', `Hello ${user.fullName || user.userName || 'User'},`, resetUrl, 'Reset Password');
 
     return { message: UserMessages.RESET_EMAIL_SENT };
