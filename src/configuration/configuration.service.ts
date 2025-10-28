@@ -33,31 +33,67 @@ export class ConfigurationService {
     let config = await this.configModel.findOne();
     if (!config) config = new this.configModel();
 
-    // Handle images: delete old if new exists
     const updatedImages: Record<string, string> = { ...(config.data?.images || {}) };
-    if (Object.keys(imageFiles).length > 0) {
-      for (const [key, file] of Object.entries(imageFiles)) {
-        // delete old file if exists
-        if (updatedImages[key]) {
-          await this.filesService.deleteFileByUrl(updatedImages[key]);
-        }
-        // save new file
-        const urls = await this.filesService.saveFilesWithKeys({ [key]: file }, 'config/images', this.host, FileType.IMAGE);
-        updatedImages[key] = urls[key];
+    const updatedVideos: Record<string, string> = { ...(config.data?.videos || {}) };
+
+    const mainVideoKey = 'main_video';
+
+    // Handle updates specifically for 'main_video'
+    if (imageFiles[mainVideoKey] || videoFiles[mainVideoKey]) {
+      // Delete any existing file for main_video, regardless of type
+      if (updatedImages[mainVideoKey]) {
+        await this.filesService.deleteFileByUrl(updatedImages[mainVideoKey]);
+        delete updatedImages[mainVideoKey];
       }
+      if (updatedVideos[mainVideoKey]) {
+        await this.filesService.deleteFileByUrl(updatedVideos[mainVideoKey]);
+        delete updatedVideos[mainVideoKey];
+      }
+
+      // Save the new file in the correct category
+      if (imageFiles[mainVideoKey]) {
+        const urls = await this.filesService.saveFilesWithKeys(
+          { [mainVideoKey]: imageFiles[mainVideoKey] },
+          'config/images',
+          this.host,
+          FileType.IMAGE
+        );
+        updatedImages[mainVideoKey] = urls[mainVideoKey];
+      } else if (videoFiles[mainVideoKey]) {
+        const urls = await this.filesService.saveFilesWithKeys(
+          { [mainVideoKey]: videoFiles[mainVideoKey] },
+          'config/videos',
+          this.host,
+          FileType.VIDEO
+        );
+        updatedVideos[mainVideoKey] = urls[mainVideoKey];
+      }
+    }
+    // Handle the rest of the files normally
+    for (const [key, file] of Object.entries(imageFiles)) {
+      if (key === mainVideoKey) continue;
+      if (updatedImages[key]) await this.filesService.deleteFileByUrl(updatedImages[key]);
+      const urls = await this.filesService.saveFilesWithKeys(
+        { [key]: file },
+        'config/images',
+        this.host,
+        FileType.IMAGE
+      );
+      updatedImages[key] = urls[key];
     }
 
-    //  Handle videos similarly
-    const updatedVideos: Record<string, string> = { ...(config.data?.videos || {}) };
-    if (Object.keys(videoFiles).length > 0) {
-      for (const [key, file] of Object.entries(videoFiles)) {
-        if (updatedVideos[key]) {
-          await this.filesService.deleteFileByUrl(updatedVideos[key]);
-        }
-        const urls = await this.filesService.saveFilesWithKeys({ [key]: file }, 'config/videos', this.host, FileType.VIDEO);
-        updatedVideos[key] = urls[key];
-      }
+    for (const [key, file] of Object.entries(videoFiles)) {
+      if (key === mainVideoKey) continue;
+      if (updatedVideos[key]) await this.filesService.deleteFileByUrl(updatedVideos[key]);
+      const urls = await this.filesService.saveFilesWithKeys(
+        { [key]: file },
+        'config/videos',
+        this.host,
+        FileType.VIDEO
+      );
+      updatedVideos[key] = urls[key];
     }
+
     // Save everything
     config.data = {
       configObj: parsedData,
