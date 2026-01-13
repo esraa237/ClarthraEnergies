@@ -1,0 +1,6 @@
+{
+    "NOT_EMPTY": "字段 {property} 不能为空",
+    "IS_STRING": "字段 {property} 必须是字符串",
+    "IS_EMAIL": "字段 {property} 必须是有效的电子邮件",
+    "IS_NUMBER": "字段 {property} 必须是数字"
+}

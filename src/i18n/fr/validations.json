@@ -1,0 +1,6 @@
+{
+    "NOT_EMPTY": "Le champ {property} ne peut pas être vide",
+    "IS_STRING": "Le champ {property} doit être une chaîne",
+    "IS_EMAIL": "Le champ {property} doit être un e-mail valide",
+    "IS_NUMBER": "Le champ {property} doit être un nombre"
+}

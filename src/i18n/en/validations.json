@@ -1,0 +1,6 @@
+{
+    "NOT_EMPTY": "Field {property} cannot be empty",
+    "IS_STRING": "Field {property} must be a string",
+    "IS_EMAIL": "Field {property} must be a valid email",
+    "IS_NUMBER": "Field {property} must be a number"
+}

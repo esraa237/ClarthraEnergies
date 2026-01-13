@@ -1,0 +1,38 @@
+{
+  "GLOBAL": {
+    "INTERNAL_SERVER_ERROR": "Erreur interne du serveur. Veuillez réessayer plus tard.",
+    "INVALID_ID": "Format d'ID invalide"
+  },
+  "APPLICATIONS": {
+    "INVALID_POSITION_ID": "Format d'ID de poste invalide",
+    "POSITION_NOT_FOUND": "Poste introuvable",
+    "NOT_FOUND": "Candidature introuvable",
+    "NOT_FOUND_ID": "Candidature avec l'ID '{id}' introuvable",
+    "STATS_ERROR": "Échec de la récupération des statistiques des candidatures"
+  },
+  "CONFIGURATION": {
+    "NOT_FOUND": "Aucune configuration trouvée. Veuillez en créer une."
+  },
+  "CONTACT": {
+    "NOT_FOUND": "Contact introuvable",
+    "MONTH_REQUIRES_YEAR": "Le filtre \"mois\" nécessite également une valeur \"année\".",
+    "STATS_ERROR": "Échec de la récupération des statistiques de contact",
+    "SEND_ERROR": "Échec de l'envoi du message de contact"
+  },
+  "PAGES": {
+    "TITLE_REQUIRED": "Le titre de la page est requis",
+    "NOT_FOUND": "Page '{title}' introuvable"
+  },
+  "POSITIONS": {
+    "CREATE_ERROR": "Échec de la création du poste",
+    "RETRIEVE_ERROR": "Échec de la récupération des postes",
+    "NOT_FOUND": "Poste introuvable",
+    "RETRIEVE_ONE_ERROR": "Échec de la récupération du poste",
+    "UPDATE_ERROR": "Échec de la mise à jour du poste",
+    "DELETE_ERROR": "Échec de la suppression du poste"
+  },
+  "SERVICES": {
+    "TITLE_REQUIRED": "Le titre du service est requis",
+    "NOT_FOUND": "Service '{title}' introuvable"
+  }
+}

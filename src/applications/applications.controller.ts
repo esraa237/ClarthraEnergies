@@ -80,7 +80,7 @@ export class ApplicationsController {
   )
   async create(
     @UploadedFiles() files: Record<string, Express.Multer.File[]>,
-    @Body() body: any,
+    @Body() body: ApplicationDataDto,
   ) {
     return this.appService.create(body, files);
   }

@@ -1,0 +1,38 @@
+{
+  "GLOBAL": {
+    "INTERNAL_SERVER_ERROR": "内部服务器错误。请稍后再试。",
+    "INVALID_ID": "ID 格式无效"
+  },
+  "APPLICATIONS": {
+    "INVALID_POSITION_ID": "职位 ID 格式无效",
+    "POSITION_NOT_FOUND": "未找到职位",
+    "NOT_FOUND": "未找到申请",
+    "NOT_FOUND_ID": "未找到 ID 为 '{id}' 的申请",
+    "STATS_ERROR": "无法检索申请统计信息"
+  },
+  "CONFIGURATION": {
+    "NOT_FOUND": "未找到配置。请创建一个。"
+  },
+  "CONTACT": {
+    "NOT_FOUND": "未找到联系人",
+    "MONTH_REQUIRES_YEAR": "\"month\" 过滤器还需要一个 \"year\" 值。",
+    "STATS_ERROR": "无法检索联系人统计信息",
+    "SEND_ERROR": "发送联系消息失败"
+  },
+  "PAGES": {
+    "TITLE_REQUIRED": "页面标题为必填项",
+    "NOT_FOUND": "未找到页面 '{title}'"
+  },
+  "POSITIONS": {
+    "CREATE_ERROR": "无法创建职位",
+    "RETRIEVE_ERROR": "无法检索职位",
+    "NOT_FOUND": "未找到职位",
+    "RETRIEVE_ONE_ERROR": "无法检索职位",
+    "UPDATE_ERROR": "无法更新职位",
+    "DELETE_ERROR": "无法删除职位"
+  },
+  "SERVICES": {
+    "TITLE_REQUIRED": "服务标题为必填项",
+    "NOT_FOUND": "未找到服务 '{title}'"
+  }
+}

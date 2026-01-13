@@ -15,3 +15,9 @@ export const ConfigurationSchema = new Schema<IConfiguration>({
     videos: { type: Object, default: {} },
   },
 });
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const mongooseI18nLocalize = require('mongoose-i18n-localize');
+ConfigurationSchema.plugin(mongooseI18nLocalize, {
+  locales: ['en', 'fr', 'zh'],
+});

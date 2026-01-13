@@ -9,26 +9,27 @@ import {
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class ApplicationDataDto {
   @ApiProperty({ example: 'John', description: 'First name of the applicant' })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: i18nValidationMessage('validations.IS_STRING') })
+  @IsNotEmpty({ message: i18nValidationMessage('validations.NOT_EMPTY') })
   firstName: string;
 
   @ApiProperty({ example: 'Doe', description: 'Last name of the applicant' })
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: i18nValidationMessage('validations.IS_STRING') })
+  @IsNotEmpty({ message: i18nValidationMessage('validations.NOT_EMPTY') })
   lastName: string;
 
   @ApiProperty({ example: 'john@domain.com', description: 'Applicant email' })
-  @IsEmail()
-  @IsNotEmpty()
+  @IsEmail({}, { message: i18nValidationMessage('validations.IS_EMAIL') })
+  @IsNotEmpty({ message: i18nValidationMessage('validations.NOT_EMPTY') })
   email: string;
 
   @ApiProperty({ example: '+20 100 1234567', description: 'Phone number' })
-  @IsNotEmpty()
-  @IsString()
+  @IsNotEmpty({ message: i18nValidationMessage('validations.NOT_EMPTY') })
+  @IsString({ message: i18nValidationMessage('validations.IS_STRING') })
   phone: string;
 
   @ApiPropertyOptional({
@@ -36,18 +37,18 @@ export class ApplicationDataDto {
     description: 'Date when the applicant is available to start',
   })
   @IsOptional()
-  @IsDateString()
+  @IsDateString({}, { message: i18nValidationMessage('validations.IS_DATE_STRING') })
   availableFrom?: Date;
 
   @ApiPropertyOptional({ example: 'Cairo', description: 'Location of applicant' })
   @IsOptional()
-  @IsString()
+  @IsString({ message: i18nValidationMessage('validations.IS_STRING') })
   location?: string;
 
   @ApiPropertyOptional({ example: 15000, description: 'Expected salary (optional)' })
   @IsOptional()
   @Type(() => Number)
-  @IsNumber()
+  @IsNumber({}, { message: i18nValidationMessage('validations.IS_NUMBER') })
   expectedSalary?: number;
 
   @ApiPropertyOptional({
@@ -55,6 +56,7 @@ export class ApplicationDataDto {
     description: 'Optional ID of the related position',
   })
   @IsOptional()
+  @IsString({ message: i18nValidationMessage('validations.IS_STRING') })
   positionId: string;
 }
 

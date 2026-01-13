@@ -1,0 +1,38 @@
+{
+  "GLOBAL": {
+    "INTERNAL_SERVER_ERROR": "Internal server error. Please try again later.",
+    "INVALID_ID": "Invalid ID format"
+  },
+  "APPLICATIONS": {
+    "INVALID_POSITION_ID": "Invalid position ID format",
+    "POSITION_NOT_FOUND": "Position not found",
+    "NOT_FOUND": "Application not found",
+    "NOT_FOUND_ID": "Application with ID '{id}' not found",
+    "STATS_ERROR": "Failed to retrieve applications statistics"
+  },
+  "CONFIGURATION": {
+    "NOT_FOUND": "No configuration found. Please create one."
+  },
+  "CONTACT": {
+    "NOT_FOUND": "Contact not found",
+    "MONTH_REQUIRES_YEAR": "The \"month\" filter requires a \"year\" value as well.",
+    "STATS_ERROR": "Failed to retrieve contact statistics",
+    "SEND_ERROR": "Failed to send contact message"
+  },
+  "PAGES": {
+    "TITLE_REQUIRED": "Page title is required",
+    "NOT_FOUND": "Page '{title}' not found"
+  },
+  "POSITIONS": {
+    "CREATE_ERROR": "Failed to create position",
+    "RETRIEVE_ERROR": "Failed to retrieve positions",
+    "NOT_FOUND": "Position not found",
+    "RETRIEVE_ONE_ERROR": "Failed to retrieve position",
+    "UPDATE_ERROR": "Failed to update position",
+    "DELETE_ERROR": "Failed to delete position"
+  },
+  "SERVICES": {
+    "TITLE_REQUIRED": "Service title is required",
+    "NOT_FOUND": "Service '{title}' not found"
+  }
+}

@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { FilesService } from '../files/file.service';
 import { FileType } from 'src/files/contstants/file.constant';
 import { IService } from './entities/services.entity';
+import { I18nContext } from 'nestjs-i18n';
 
 @Injectable()
 export class ServicesService {
@@ -30,7 +31,7 @@ export class ServicesService {
     if (parsedData.data) parsedData = JSON.parse(parsedData.data);
 
     const { title, ...serviceObj } = parsedData;
-    if (!title) throw new Error('Service title is required');
+    if (!title) throw new Error(I18nContext.current()!.t('errors.SERVICES.TITLE_REQUIRED'));
 
     // Filter image files
     const imageFiles: Record<string, Express.Multer.File> = {};
@@ -70,13 +71,13 @@ export class ServicesService {
 
   async getService(title: string) {
     const service = await this.serviceModel.findOne({ title });
-    if (!service) throw new NotFoundException(`Service '${title}' not found`);
+    if (!service) throw new NotFoundException(this.t('errors.SERVICES.NOT_FOUND', { args: { title } }));
     return service;
   }
 
   async getAllServices() {
     const services = await this.serviceModel.find().select('title');
-    if (!services || services.length === 0) return { message: 'No services found' };
+    if (!services || services.length === 0) return { message: this.t('events.SERVICES.NO_SERVICES') };
     return services;
   }
 
@@ -94,7 +95,7 @@ export class ServicesService {
     ]);
 
     if (!services || services.length === 0)
-      return { message: 'No services found', total: 0, page, limit };
+      return { message: this.t('events.SERVICES.NO_SERVICES'), total: 0, page, limit };
 
     return {
       total,
@@ -108,20 +109,28 @@ export class ServicesService {
   async deleteService(title: string) {
     const service = await this.serviceModel.findOne({ title });
     if (!service) {
-      throw new NotFoundException(`Service '${title}' not found`);
+      throw new NotFoundException(this.t('errors.SERVICES.NOT_FOUND', { args: { title } }));
     }
 
     // Delete any associated files (e.g., images)
     if (service.data?.images) {
       const imageUrls = Object.values(service.data.images);
       for (const url of imageUrls) {
-        await this.filesService.deleteFileByUrl(url);
+        if (typeof url === 'string') {
+            await this.filesService.deleteFileByUrl(url);
+        }
       }
     }
 
     await this.serviceModel.deleteOne({ _id: service._id });
-    return { message: `Service '${title}' deleted successfully` };
+    return { message: this.t('events.SERVICES.DELETE_SUCCESS', { args: { title } }) };
   }
 
-
+  private t(key: string, options?: any): string {
+      const i18n = I18nContext.current();
+      if (i18n) {
+          return i18n.t(key, options);
+      }
+      return key;
+  }
 }

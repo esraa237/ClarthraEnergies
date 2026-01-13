@@ -6,6 +6,7 @@ import { FileType } from 'src/files/contstants/file.constant';
 import { FilesService } from 'src/files/file.service';
 import { Application } from './entities/application.entity';
 import { Position } from 'src/positions/entities/position.entity';
+import { I18nContext } from 'nestjs-i18n';
 
 @Injectable()
 export class ApplicationsService {
@@ -21,12 +22,12 @@ export class ApplicationsService {
     let positionId: null | string = null;
     if (body.positionId) {
       if (!isValidObjectId(body.positionId)) {
-        throw new BadRequestException('Invalid position ID format');
+        throw new BadRequestException(I18nContext.current()!.t('errors.APPLICATIONS.INVALID_POSITION_ID'));
       }
 
       const positionExists = await this.positionModel.exists({ _id: body.positionId });
       if (!positionExists) {
-        throw new BadRequestException('Position not found');
+        throw new BadRequestException(I18nContext.current()!.t('errors.APPLICATIONS.POSITION_NOT_FOUND'));
       }
 
       positionId = body.positionId;
@@ -57,7 +58,7 @@ export class ApplicationsService {
     });
 
     return {
-      message: 'Application submitted successfully',
+      message: I18nContext.current()!.t('events.APPLICATIONS.SUBMIT_SUCCESS'),
       application: created,
     };
   }
@@ -114,7 +115,7 @@ export class ApplicationsService {
         options: { retainNullValues: true },
       }).lean();
 
-    if (!application) throw new BadRequestException('No application found for this ');
+    if (!application) throw new BadRequestException(I18nContext.current()!.t('errors.APPLICATIONS.NOT_FOUND_ID', { args: { id } }));
     const data = {
       ...application,
       position: application.positionId || null,
@@ -127,7 +128,7 @@ export class ApplicationsService {
   async deleteById(id: string) {
     const application = await this.applicationModel.findById(id);
     if (!application) {
-      throw new BadRequestException(`Application with ID '${id}' not found`);
+      throw new BadRequestException(I18nContext.current()!.t('errors.APPLICATIONS.NOT_FOUND_ID', { args: { id } }));
     }
 
     if (application.files) {
@@ -139,17 +140,17 @@ export class ApplicationsService {
 
     await this.applicationModel.deleteOne({ _id: id });
 
-    return { message: `Application with ID '${id}' deleted successfully` };
+    return { message: I18nContext.current()!.t('events.APPLICATIONS.DELETE_SUCCESS', { args: { id } }) };
   }
 
   async updateStatus(id: string, status: 'pending' | 'approved' | 'rejected' | 'contacted') {
     const application = await this.applicationModel.findById(id);
-    if (!application) throw new BadRequestException('Application not found');
+    if (!application) throw new BadRequestException(I18nContext.current()!.t('errors.APPLICATIONS.NOT_FOUND'));
 
     application.status = status;
     await application.save();
 
-    return { message: `Application status updated to '${status}'`, application };
+    return { message: I18nContext.current()!.t('events.APPLICATIONS.UPDATE_STATUS', { args: { status } }), application };
   }
 
   async getApplicationsStatistics(year?: number, month?: number): Promise<any> {
@@ -237,7 +238,7 @@ export class ApplicationsService {
         byPosition: positionDistribution,
       };
     } catch (error) {
-      throw new InternalServerErrorException('Failed to retrieve applications statistics');
+      throw new InternalServerErrorException(I18nContext.current()!.t('errors.APPLICATIONS.STATS_ERROR'));
     }
   }
 }

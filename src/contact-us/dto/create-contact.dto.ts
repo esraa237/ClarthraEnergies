@@ -1,36 +1,37 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsBoolean, IsEmail, IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreateContactDto {
     @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+    @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
     fullName: string;
 
     @ApiProperty({ required: true })
-    @IsString()
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
     @IsOptional()
     organization: string;
 
     @ApiProperty()
-    @IsEmail()
-    @IsNotEmpty()
+    @IsEmail({}, { message: i18nValidationMessage('validation.IS_EMAIL') })
+    @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
     email: string;
 
     @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+    @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
     areaOfInterest: string;
 
     @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+    @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
     representation: string;
 
     @ApiProperty()
-    @IsString()
-    @IsNotEmpty()
+    @IsString({ message: i18nValidationMessage('validation.IS_STRING') })
+    @IsNotEmpty({ message: i18nValidationMessage('validation.NOT_EMPTY') })
     message: string;
 }
 

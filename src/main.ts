@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { SeederService } from './seeder/seeder.service';
 import { ValidationPipe } from '@nestjs/common';
+import { I18nValidationPipe } from 'nestjs-i18n';
 import * as dotenv from 'dotenv';
 
 async function bootstrap() {
@@ -36,6 +37,17 @@ async function bootstrap() {
     },
     'access-token' // this name is used in @ApiBearerAuth()
   )
+  .addGlobalParameters({
+    name: 'Accept-Language',
+    in: 'header',
+    description: 'Language preference for the response (en, fr, zh)',
+    required: false,
+    schema: {
+      type: 'string',
+      default: 'en',
+      enum: ['en', 'fr', 'zh'],
+    },
+  })
   .build();
   
   dotenv.config();
@@ -44,7 +56,7 @@ async function bootstrap() {
   SwaggerModule.setup('api-docs', app, document);
 
   //global dto error handling
-  app.useGlobalPipes(new ValidationPipe({
+  app.useGlobalPipes(new I18nValidationPipe({
     whitelist: true,
     forbidNonWhitelisted: true,
     transform: true,

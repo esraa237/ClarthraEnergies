@@ -17,6 +17,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/common/role.enum';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { LocalizationInterceptor } from 'src/common/interceptors/localization.interceptor';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -181,6 +182,7 @@ export class ServicesController {
       },
     },
   })
+  @UseInterceptors(LocalizationInterceptor)
   async getAllServicesPaginated(
     @Query('page') page = 1,
     @Query('limit') limit = 10,
@@ -205,6 +207,7 @@ export class ServicesController {
     description: 'No services found.',
     schema: { example: { message: 'No services found' } },
   })
+  @UseInterceptors(LocalizationInterceptor)
   async getAllTitlesServices() {
     return this.servicesService.getAllServices();
   }
@@ -255,6 +258,7 @@ export class ServicesController {
     description: 'Service not found.',
     schema: { example: { message: 'Service not found' } },
   })
+  @UseInterceptors(LocalizationInterceptor)
   async getService(@Param('title') title: string) {
     return this.servicesService.getService(title);
   }

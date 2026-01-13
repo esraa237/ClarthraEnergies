@@ -10,6 +10,7 @@ import {
   Query,
   HttpStatus,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PositionsService } from './positions.service';
 import { CreatePositionDto, PaginatedPositionsResponseDto, PaginationDto, PositionWithApplicationsDto } from './dto/position.dto';
@@ -27,6 +28,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/common/role.enum';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
+import { LocalizationInterceptor } from 'src/common/interceptors/localization.interceptor';
 
 @ApiTags('Positions')
 @Controller('positions')
@@ -64,6 +66,7 @@ export class PositionsController {
     type: PaginatedPositionsResponseDto,
   })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server error.' })
+  @UseInterceptors(LocalizationInterceptor)
   async findAll(@Query() query: PaginationDto) {
     return this.positionsService.findAll(query);
   }
@@ -78,6 +81,7 @@ export class PositionsController {
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid ID format.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Position not found.' })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Server error.' })
+  @UseInterceptors(LocalizationInterceptor)
   async findOne(@Param('id') id: string): Promise<Position> {
     return this.positionsService.findOne(id);
   }

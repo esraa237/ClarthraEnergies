@@ -1,0 +1,23 @@
+{
+  "GLOBAL": {
+    "NO_DATA": "No data found"
+  },
+  "APPLICATIONS": {
+    "SUBMIT_SUCCESS": "Application submitted successfully",
+    "UPDATE_STATUS": "Application status updated to '{status}'",
+    "DELETE_SUCCESS": "Application with ID '{id}' deleted successfully"
+  },
+  "CONTACT": {
+    "SEND_SUCCESS": "Your message has been sent successfully.",
+    "NO_CONTACTS": "No contacts found",
+    "MARK_READ": "Contact marked as read",
+    "MARK_UNREAD": "Contact marked as unread"
+  },
+  "PAGES": {
+    "NO_PAGES": "No pages found"
+  },
+  "SERVICES": {
+    "NO_SERVICES": "No services found",
+    "DELETE_SUCCESS": "Service '{title}' deleted successfully"
+  }
+}

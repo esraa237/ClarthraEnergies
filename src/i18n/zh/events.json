@@ -1,0 +1,23 @@
+{
+  "GLOBAL": {
+    "NO_DATA": "未找到数据"
+  },
+  "APPLICATIONS": {
+    "SUBMIT_SUCCESS": "申请提交成功",
+    "UPDATE_STATUS": "申请状态已更新为 '{status}'",
+    "DELETE_SUCCESS": "ID 为 '{id}' 的申请已成功删除"
+  },
+  "CONTACT": {
+    "SEND_SUCCESS": "您的消息已成功发送。",
+    "NO_CONTACTS": "未找到联系人",
+    "MARK_READ": "联系人标记为已读",
+    "MARK_UNREAD": "联系人标记为未读"
+  },
+  "PAGES": {
+    "NO_PAGES": "未找到页面"
+  },
+  "SERVICES": {
+    "NO_SERVICES": "未找到服务",
+    "DELETE_SUCCESS": "服务 '{title}' 删除成功"
+  }
+}

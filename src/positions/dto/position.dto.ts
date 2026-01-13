@@ -1,20 +1,18 @@
-// dto/create-position.dto.ts
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsEnum, IsOptional, IsString, IsNotEmpty, IsInt, Min } from 'class-validator';
 import { PositionType } from '../positions.constants';
 import { Type } from 'class-transformer';
 import { Position } from '../entities/position.entity';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 export class CreatePositionDto {
   @ApiProperty({ example: 'Frontend Developer' })
-  @IsString()
-  @IsNotEmpty()
-  name: string;
+  @IsOptional() // Allow string or object
+  name: any;
 
   @ApiProperty({ example: 'Cairo, Egypt' })
-  @IsString()
-  @IsNotEmpty()
-  location: string;
+  @IsOptional()
+  location: any;
 
   @ApiProperty({
     enum: PositionType,
@@ -22,28 +20,24 @@ export class CreatePositionDto {
     example: PositionType.FULL_TIME,
     description: `Type of employment ['Full-time', 'Part-time', 'Internship', 'Freelance', 'Contract','Temporary']`,
   })
-  @IsEnum(PositionType)
+  @IsEnum(PositionType, { message: i18nValidationMessage('validation.IS_ENUM') })
   type: string;
 
   @ApiPropertyOptional({ example: 'Competitive salary and benefits' })
   @IsOptional()
-  @IsString()
-  whatWeOffer?: string;
+  whatWeOffer?: any;
 
   @ApiPropertyOptional({ example: 'We are expanding our tech team' })
   @IsOptional()
-  @IsString()
-  whyWeAreLooking?: string;
+  whyWeAreLooking?: any;
 
   @ApiPropertyOptional({ example: 'Develop responsive UIs' })
   @IsOptional()
-  @IsString()
-  responsibilities?: string;
+  responsibilities?: any;
 
   @ApiPropertyOptional({ example: 'HTML, CSS, React' })
   @IsOptional()
-  @IsString()
-  skills?: string;
+  skills?: any;
 }
 
 export class PaginationDto {

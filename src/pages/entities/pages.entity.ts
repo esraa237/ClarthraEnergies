@@ -15,3 +15,9 @@ export const PageSchema = new Schema<IPage>({
     images: { type: Object, default: {} },
   },
 });
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const mongooseI18nLocalize = require('mongoose-i18n-localize');
+PageSchema.plugin(mongooseI18nLocalize, {
+  locales: ['en', 'fr', 'zh'],
+});

@@ -7,6 +7,7 @@ import { Roles } from 'src/auth/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/common/role.enum';
+import { LocalizationInterceptor } from 'src/common/interceptors/localization.interceptor';
 
 @Controller('/config')
 export class ConfigurationController {
@@ -130,6 +131,7 @@ export class ConfigurationController {
     status: HttpStatus.UNAUTHORIZED,
     description: 'Unauthorized - jwt token wrong or you arenot super admin or admin'
   })
+  @UseInterceptors(LocalizationInterceptor)
   async getConfig() {
     return this.configService.getConfiguration();
   }

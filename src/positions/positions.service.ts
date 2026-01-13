@@ -10,6 +10,7 @@ import mongoose, { isValidObjectId, Model } from 'mongoose';
 import { Position } from './entities/position.entity';
 import { CreatePositionDto, PaginationDto } from './dto/position.dto';
 import { Application } from 'src/applications/entities/application.entity';
+import { I18nContext } from 'nestjs-i18n';
 
 @Injectable()
 export class PositionsService {
@@ -22,7 +23,7 @@ export class PositionsService {
     try {
       return await this.positionModel.create(data);
     } catch (error) {
-      throw new InternalServerErrorException('Failed to create position');
+      throw new InternalServerErrorException(I18nContext.current()!.t('errors.POSITIONS.CREATE_ERROR'));
     }
   }
 
@@ -83,7 +84,7 @@ export class PositionsService {
         data,
       };
     } catch (error) {
-      throw new InternalServerErrorException('Failed to retrieve positions');
+      throw new InternalServerErrorException(I18nContext.current()!.t('errors.POSITIONS.RETRIEVE_ERROR'));
     }
   }
 
@@ -132,11 +133,11 @@ export class PositionsService {
       ]);
 
       const position = result[0];
-      if (!position) throw new NotFoundException('Position not found');
+      if (!position) throw new NotFoundException(I18nContext.current()!.t('errors.POSITIONS.NOT_FOUND'));
       return position;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Failed to retrieve position');
+      throw new InternalServerErrorException(I18nContext.current()!.t('errors.POSITIONS.RETRIEVE_ONE_ERROR'));
     }
   }
 
@@ -144,14 +145,19 @@ export class PositionsService {
   async update(id: string, data: Partial<CreatePositionDto>): Promise<Position> {
     this.validateId(id);
     try {
+      // Backend now receives full localized objects (e.g. { en: "...", fr: "..." })
+      // So we can pass data directly.
+      
       const position = await this.positionModel.findByIdAndUpdate(id, data, {
         new: true,
       });
-      if (!position) throw new NotFoundException('Position not found');
+      if (!position) throw new NotFoundException(I18nContext.current()?.t('errors.POSITIONS.NOT_FOUND') || 'Position not found');
       return position;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Failed to update position');
+      console.error('Error updating position:', error);
+      const i18n = I18nContext.current();
+      throw new InternalServerErrorException(i18n ? i18n.t('errors.POSITIONS.UPDATE_ERROR') : 'Error updating position');
     }
   }
 
@@ -159,20 +165,22 @@ export class PositionsService {
     this.validateId(id);
     try {
       const position = await this.positionModel.findById(id);
-      if (!position) throw new NotFoundException('Position not found');
+      if (!position) throw new NotFoundException(I18nContext.current()!.t('errors.POSITIONS.NOT_FOUND'));
 
       await this.applicationModel.deleteMany({ positionId: id });
 
       await this.positionModel.findByIdAndDelete(id);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException('Failed to delete position');
+      throw new InternalServerErrorException(I18nContext.current()!.t('errors.POSITIONS.DELETE_ERROR'));
     }
   }
 
   private validateId(id: string) {
     if (!isValidObjectId(id)) {
-      throw new BadRequestException('Invalid ID format');
+      throw new BadRequestException(I18nContext.current()?.t('errors.GLOBAL.INVALID_ID') || 'Invalid ID');
     }
   }
+
+  // toLocalizedPayload is no longer needed as frontend sends full object
 }

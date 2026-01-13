@@ -1,0 +1,23 @@
+{
+  "GLOBAL": {
+    "NO_DATA": "Aucune donnée trouvée"
+  },
+  "APPLICATIONS": {
+    "SUBMIT_SUCCESS": "Candidature soumise avec succès",
+    "UPDATE_STATUS": "Statut de la candidature mis à jour à '{status}'",
+    "DELETE_SUCCESS": "Candidature avec l'ID '{id}' supprimée avec succès"
+  },
+  "CONTACT": {
+    "SEND_SUCCESS": "Votre message a été envoyé avec succès.",
+    "NO_CONTACTS": "Aucun contact trouvé",
+    "MARK_READ": "Contact marqué comme lu",
+    "MARK_UNREAD": "Contact marqué comme non lu"
+  },
+  "PAGES": {
+    "NO_PAGES": "Aucune page trouvée"
+  },
+  "SERVICES": {
+    "NO_SERVICES": "Aucun service trouvé",
+    "DELETE_SUCCESS": "Service '{title}' supprimé avec succès"
+  }
+}

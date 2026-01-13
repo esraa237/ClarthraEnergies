@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { FilesService } from '../files/file.service';
 import { FileType } from 'src/files/contstants/file.constant';
 import { IPage } from './entities/pages.entity';
+import { I18nContext } from 'nestjs-i18n';
 
 @Injectable()
 export class PagesService {
@@ -27,7 +28,7 @@ export class PagesService {
         if (parsedData.data) parsedData = JSON.parse(parsedData.data);
 
         const { title, ...pageObj } = parsedData;
-        if (!title) throw new Error('Page title is required');
+        if (!title) throw new Error(I18nContext.current()!.t('errors.PAGES.TITLE_REQUIRED'));
 
         // Split files (images only)
         const imageFiles: Record<string, Express.Multer.File> = {};
@@ -63,14 +64,14 @@ export class PagesService {
 
     async getPage(title: string) {
         const page = await this.pageModel.findOne({ title });
-        if (!page) throw new NotFoundException(`Page '${title}' not found`);
+        if (!page) throw new NotFoundException(I18nContext.current()!.t('errors.PAGES.NOT_FOUND', { args: { title } }));
         return page.data;
     }
 
     async getAllPages() {
         const pages = await this.pageModel.find().select('title');
         if (!pages || pages.length === 0) {
-            return { message: 'No pages found' };
+            return { message: I18nContext.current()!.t('events.PAGES.NO_PAGES') };
         }
         return pages;
     }

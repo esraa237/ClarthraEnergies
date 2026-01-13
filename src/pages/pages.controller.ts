@@ -16,6 +16,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { Role } from 'src/common/role.enum';
 import { Roles } from 'src/auth/decorators/roles.decorator';
+import { LocalizationInterceptor } from 'src/common/interceptors/localization.interceptor';
 import {
     ApiBearerAuth,
     ApiOperation,
@@ -226,6 +227,7 @@ export class PagesController {
             },
         },
     })
+    @UseInterceptors(LocalizationInterceptor)
     async getAllPagesPaginated(
         @Query('page') page = 1,
         @Query('limit') limit = 10,
@@ -251,6 +253,7 @@ export class PagesController {
             ],
         },
     })
+    @UseInterceptors(LocalizationInterceptor)
     async getAllPages() {
         return this.pageService.getAllPages();
     }
@@ -305,6 +308,7 @@ export class PagesController {
         status: HttpStatus.NOT_FOUND,
         description: 'Page not found',
     })
+    @UseInterceptors(LocalizationInterceptor)
     async getPage(@Param('title') title: string) {
         return this.pageService.getPage(title);
     }

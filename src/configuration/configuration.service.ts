@@ -4,6 +4,7 @@ import { IConfiguration } from './entities/configuration.entity';
 import { FilesService } from '../files/file.service';
 import { FileType } from 'src/files/contstants/file.constant';
 import { InjectModel } from '@nestjs/mongoose';
+import { I18nContext } from 'nestjs-i18n';
 
 @Injectable()
 export class ConfigurationService {
@@ -109,7 +110,7 @@ export class ConfigurationService {
   async getConfiguration() {
     const config = await this.configModel.findOne();
     if (!config) {
-      throw new NotFoundException('No configuration found. Please create one.');
+      throw new NotFoundException(I18nContext.current()!.t('errors.CONFIGURATION.NOT_FOUND'));
     }
     return config.data;
   }

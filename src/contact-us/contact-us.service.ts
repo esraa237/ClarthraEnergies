@@ -6,6 +6,7 @@ import { CreateContactDto, UpdateReadStatusDto } from './dto/create-contact.dto'
 import { Contact } from './entities/contact-us.entity';
 import { MailService } from 'src/mail/mail.service';
 import { contactUsTemplate } from 'src/mail/contact-us-template';
+import { I18nContext } from 'nestjs-i18n';
 
 @Injectable()
 export class ContactUsService {
@@ -21,12 +22,12 @@ export class ContactUsService {
 
             await this.sendContactEmail(savedContact);
             return {
-                message: 'Your message has been sent successfully.',
+                message: I18nContext.current()!.t('events.CONTACT.SEND_SUCCESS'),
                 data: savedContact,
             };
         } catch (error) {
             throw new InternalServerErrorException(
-                'Internal server error. Please try again later.',
+                I18nContext.current()!.t('errors.GLOBAL.INTERNAL_SERVER_ERROR'),
             );
         }
     }
@@ -50,7 +51,7 @@ export class ContactUsService {
         ]);
 
         if (total === 0) {
-            return { message: 'No contacts found' };
+            return { message: I18nContext.current()!.t('events.CONTACT.NO_CONTACTS') };
         }
 
         return {
@@ -71,10 +72,14 @@ export class ContactUsService {
             { new: true },
         );
 
-        if (!contact) throw new NotFoundException('Contact not found');
+        if (!contact) throw new NotFoundException(I18nContext.current()!.t('errors.CONTACT.NOT_FOUND'));
+
+        const message = isRead
+            ? I18nContext.current()!.t('events.CONTACT.MARK_READ')
+            : I18nContext.current()!.t('events.CONTACT.MARK_UNREAD');
 
         return {
-            message: `Contact marked as ${isRead ? 'read' : 'unread'}`,
+            message,
             contact,
         };
     }
@@ -82,7 +87,7 @@ export class ContactUsService {
     async getContactStatistics(year?: number, month?: number) {
         if (month && !year) {
             throw new HttpException(
-                'The "month" filter requires a "year" value as well.',
+                I18nContext.current()!.t('errors.CONTACT.MONTH_REQUIRES_YEAR'),
                 HttpStatus.BAD_REQUEST,
             );
         }
@@ -142,7 +147,7 @@ export class ContactUsService {
                 selectedMonth,
             };
         } catch (error) {
-            throw new InternalServerErrorException('Failed to retrieve contact statistics');
+            throw new InternalServerErrorException(I18nContext.current()!.t('errors.CONTACT.STATS_ERROR'));
         }
     }
 
@@ -165,7 +170,7 @@ export class ContactUsService {
             });
         } catch (error) {
             console.error('Error sending contact email:', error);
-            throw new InternalServerErrorException('Failed to send contact message');
+            throw new InternalServerErrorException(I18nContext.current()!.t('errors.CONTACT.SEND_ERROR'));
         }
     }
 }
