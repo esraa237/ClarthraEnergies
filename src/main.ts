@@ -13,6 +13,8 @@ async function bootstrap() {
   const allowedOrigins = [
     process.env.FRONT_ADMIN_URL,
     process.env.FRONT_WEBSITE_URL,
+    process.env.FRONTEND_WEBSITE,
+  
   ];
   
   app.enableCors({
