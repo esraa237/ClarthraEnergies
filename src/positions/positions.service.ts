@@ -11,6 +11,7 @@ import { Position } from './entities/position.entity';
 import { CreatePositionDto, PaginationDto } from './dto/position.dto';
 import { Application } from 'src/applications/entities/application.entity';
 import { I18nContext } from 'nestjs-i18n';
+import { sanitizeHtmlField } from '../utils/sanitize.util';
 
 @Injectable()
 export class PositionsService {
@@ -21,7 +22,14 @@ export class PositionsService {
 
   async create(data: CreatePositionDto): Promise<Position> {
     try {
-      return await this.positionModel.create(data);
+      const sanitizedData = {
+        ...data,
+        whatWeOffer: sanitizeHtmlField(data.whatWeOffer),
+        whyWeAreLooking: sanitizeHtmlField(data.whyWeAreLooking),
+        responsibilities: sanitizeHtmlField(data.responsibilities),
+        skills: sanitizeHtmlField(data.skills),
+      };
+      return await this.positionModel.create(sanitizedData);
     } catch (error) {
       throw new InternalServerErrorException(I18nContext.current()!.t('errors.POSITIONS.CREATE_ERROR'));
     }
@@ -147,8 +155,16 @@ export class PositionsService {
     try {
       // Backend now receives full localized objects (e.g. { en: "...", fr: "..." })
       // So we can pass data directly.
+      const sanitizedData = {
+        ...data,
+      };
       
-      const position = await this.positionModel.findByIdAndUpdate(id, data, {
+      if (sanitizedData.whatWeOffer) sanitizedData.whatWeOffer = sanitizeHtmlField(sanitizedData.whatWeOffer);
+      if (sanitizedData.whyWeAreLooking) sanitizedData.whyWeAreLooking = sanitizeHtmlField(sanitizedData.whyWeAreLooking);
+      if (sanitizedData.responsibilities) sanitizedData.responsibilities = sanitizeHtmlField(sanitizedData.responsibilities);
+      if (sanitizedData.skills) sanitizedData.skills = sanitizeHtmlField(sanitizedData.skills);
+      
+      const position = await this.positionModel.findByIdAndUpdate(id, sanitizedData, {
         new: true,
       });
       if (!position) throw new NotFoundException(I18nContext.current()?.t('errors.POSITIONS.NOT_FOUND') || 'Position not found');
