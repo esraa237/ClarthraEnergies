@@ -29,10 +29,12 @@
     "NOT_FOUND": "Poste introuvable",
     "RETRIEVE_ONE_ERROR": "Échec de la récupération du poste",
     "UPDATE_ERROR": "Échec de la mise à jour du poste",
-    "DELETE_ERROR": "Échec de la suppression du poste"
+    "DELETE_ERROR": "Échec de la suppression du poste",
+    "VALIDATION_ERROR": "La validation du poste a échoué. Tous les champs multilingues requis doivent être renseignés."
   },
   "SERVICES": {
     "TITLE_REQUIRED": "Le titre du service est requis",
-    "NOT_FOUND": "Service '{title}' introuvable"
+    "NOT_FOUND": "Service '{title}' introuvable",
+    "VALIDATION_ERROR": "La validation du service a échoué. Tous les champs multilingues requis doivent être renseignés."
   }
 }

@@ -11,7 +11,10 @@ import {
   Query,
   Delete,
 } from '@nestjs/common';
-import { AnyFilesInterceptor, FileFieldsInterceptor } from '@nestjs/platform-express';
+import {
+  AnyFilesInterceptor,
+  FileFieldsInterceptor,
+} from '@nestjs/platform-express';
 import { ServicesService } from './services.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
@@ -29,7 +32,7 @@ import {
 
 @Controller('/services')
 export class ServicesController {
-  constructor(private readonly servicesService: ServicesService) { }
+  constructor(private readonly servicesService: ServicesService) {}
 
   @Post('/add-or-update')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -47,14 +50,23 @@ export class ServicesController {
           properties: {
             title: { type: 'string', example: 'web-development' },
             main_color: { type: 'string', example: '#0055ff' },
-            sub_title: { type: 'string', example: 'Build your website with us' },
-            paragraph: { type: 'string', example: 'We offer full-stack web services...' },
+            sub_title: {
+              type: 'string',
+              example: 'Build your website with us',
+            },
+            paragraph: {
+              type: 'string',
+              example: 'We offer full-stack web services...',
+            },
             details: {
               type: 'array',
               items: {
                 type: 'object',
                 properties: {
-                  icon: { type: 'string', example: 'fa-code or file upload name' },
+                  icon: {
+                    type: 'string',
+                    example: 'fa-code or file upload name',
+                  },
                   title: { type: 'string', example: 'Frontend Development' },
                   points: {
                     type: 'object',
@@ -91,32 +103,33 @@ export class ServicesController {
     description: 'Service created or updated successfully.',
     schema: {
       example: {
-        "serviceObj": {
-          "main_color": "#0055ff",
-          "sub_title": "Build your website with us",
-          "paragraph": "We offer full-stack web services...",
-          "details": [
+        serviceObj: {
+          main_color: '#0055ff',
+          sub_title: 'Build your website with us',
+          paragraph: 'We offer full-stack web services...',
+          details: [
             {
-              "icon": "fa-code or file upload name",
-              "title": "Frontend Development",
-              "points": {
-                "point1": "HTML, CSS",
-                "point2": "React, Angular"
-              }
-            }
+              icon: 'fa-code or file upload name',
+              title: 'Frontend Development',
+              points: {
+                point1: 'HTML, CSS',
+                point2: 'React, Angular',
+              },
+            },
           ],
-          "main_button": {
-            "name": "Learn More",
-            "link": "/services"
+          main_button: {
+            name: 'Learn More',
+            link: '/services',
           },
-          "home_button": {
-            "name": "Explore Now",
-            "link": "/home"
-          }
+          home_button: {
+            name: 'Explore Now',
+            link: '/home',
+          },
         },
-        "images": {
-          "service-image": "http://localhost:3000/uploads/services/web-development/images/service-image-1760303129827-5a5511a0fcb5.jpg"
-        }
+        images: {
+          'service-image':
+            'http://localhost:3000/uploads/services/web-development/images/service-image-1760303129827-5a5511a0fcb5.jpg',
+        },
       },
     },
   })
@@ -133,9 +146,7 @@ export class ServicesController {
     status: HttpStatus.FORBIDDEN,
     description: 'Forbidden - only admins can perform this action.',
   })
-  @UseInterceptors(
-    AnyFilesInterceptor()
-  )
+  @UseInterceptors(AnyFilesInterceptor())
   async createOrUpdateService(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() data: string | Record<string, any>,
@@ -212,44 +223,63 @@ export class ServicesController {
     return this.servicesService.getAllServices();
   }
 
-  @Get(':title')
-  @ApiOperation({ summary: 'Get specific service content using title and the respose have data that have object and images ,title and _id' })
+  @Get('/by-title/:title')
+  @ApiOperation({ summary: 'Get specific service content using title slug' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Service retrieved successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Service not found.',
+  })
+  @UseInterceptors(LocalizationInterceptor)
+  async getServiceByTitle(@Param('title') title: string) {
+    return this.servicesService.getServiceByTitle(title);
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    summary:
+      'Get specific service content using id and the respose have data that have object and images ,title and _id',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Service retrieved successfully.',
     schema: {
       example: {
-        "data": {
-          "serviceObj": {
-            "main_color": "#0055ff",
-            "sub_title": "Build your website with us",
-            "paragraph": "We offer full-stack web services...",
-            "details": [
+        data: {
+          serviceObj: {
+            main_color: '#0055ff',
+            sub_title: 'Build your website with us',
+            paragraph: 'We offer full-stack web services...',
+            details: [
               {
-                "icon": "fa-code or file upload name",
-                "title": "Frontend Development",
-                "points": {
-                  "point1": "HTML, CSS",
-                  "point2": "React, Angular"
-                }
-              }
+                icon: 'fa-code or file upload name',
+                title: 'Frontend Development',
+                points: {
+                  point1: 'HTML, CSS',
+                  point2: 'React, Angular',
+                },
+              },
             ],
-            "main_button": {
-              "name": "Learn More",
-              "link": "/services"
+            main_button: {
+              name: 'Learn More',
+              link: '/services',
             },
-            "home_button": {
-              "name": "Explore Now",
-              "link": "/home"
-            }
+            home_button: {
+              name: 'Explore Now',
+              link: '/home',
+            },
           },
-          "images": {
-            "service-image": "http://localhost:3000/uploads/services/web-development/images/service-image-1760303678420-67bddf0d5936.jpg"
-          }
+          images: {
+            'service-image':
+              'http://localhost:3000/uploads/services/web-development/images/service-image-1760303678420-67bddf0d5936.jpg',
+          },
         },
-        "_id": "68ec17d6e181eea0aea366ed",
-        "title": "web-development",
-        "__v": 0
+        _id: '68ec17d6e181eea0aea366ed',
+        title: 'web-development',
+        __v: 0,
       },
     },
   })
@@ -259,18 +289,24 @@ export class ServicesController {
     schema: { example: { message: 'Service not found' } },
   })
   @UseInterceptors(LocalizationInterceptor)
-  async getService(@Param('title') title: string) {
-    return this.servicesService.getService(title);
+  async getService(@Param('id') id: string) {
+    return this.servicesService.getService(id);
   }
 
-  @Delete(':title')
+  @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(Role.SUPER_ADMIN, Role.ADMIN)
   @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Delete a service by title (for Admin only)' })
-  @ApiResponse({ status: HttpStatus.OK, description: 'Service deleted successfully' })
-  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Service not found' })
-  async deleteService(@Param('title') title: string) {
-    return this.servicesService.deleteService(title);
+  @ApiOperation({ summary: 'Delete a service by id (for Admin only)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Service deleted successfully',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: 'Service not found',
+  })
+  async deleteService(@Param('id') id: string) {
+    return this.servicesService.deleteService(id);
   }
 }

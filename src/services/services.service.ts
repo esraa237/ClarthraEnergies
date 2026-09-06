@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, isValidObjectId } from 'mongoose';
 import { FilesService } from '../files/file.service';
 import { FileType } from 'src/files/contstants/file.constant';
 import { IService } from './entities/services.entity';
@@ -13,7 +17,7 @@ export class ServicesService {
   constructor(
     @InjectModel('Service') private readonly serviceModel: Model<IService>,
     private readonly filesService: FilesService,
-  ) { }
+  ) {}
 
   async createOrUpdate(
     data: string | Record<string, any>,
@@ -30,8 +34,11 @@ export class ServicesService {
     let parsedData = typeof data === 'string' ? JSON.parse(data) : data;
     if (parsedData.data) parsedData = JSON.parse(parsedData.data);
 
-    const { title, ...serviceObj } = parsedData;
-    if (!title) throw new Error(I18nContext.current()!.t('errors.SERVICES.TITLE_REQUIRED'));
+    const { _id, title, ...serviceObj } = parsedData;
+    if (!title)
+      throw new Error(
+        I18nContext.current()!.t('errors.SERVICES.TITLE_REQUIRED'),
+      );
 
     // Filter image files
     const imageFiles: Record<string, Express.Multer.File> = {};
@@ -41,17 +48,36 @@ export class ServicesService {
     }
 
     // Check if service exists
-    let service = await this.serviceModel.findOne({ title });
-    if (!service) service = new this.serviceModel({ title });
+    let service: IService | null = null;
+    if (_id) {
+      if (!isValidObjectId(_id)) {
+        throw new NotFoundException(
+          this.t('errors.SERVICES.NOT_FOUND', { args: { title: _id } }),
+        );
+      }
+      service = await this.serviceModel.findById(_id);
+      if (!service) {
+        throw new NotFoundException(
+          this.t('errors.SERVICES.NOT_FOUND', { args: { title: _id } }),
+        );
+      }
+    } else {
+      service = new this.serviceModel({ title });
+    }
+
+    service.title = title;
 
     // Handle image updates
-    const updatedImages: Record<string, string> = { ...(service.data?.images || {}) };
+    const updatedImages: Record<string, string> = {
+      ...(service.data?.images || {}),
+    };
     if (Object.keys(imageFiles).length > 0) {
       for (const [key, file] of Object.entries(imageFiles)) {
-        if (updatedImages[key]) await this.filesService.deleteFileByUrl(updatedImages[key]);
+        if (updatedImages[key])
+          await this.filesService.deleteFileByUrl(updatedImages[key]);
         const urls = await this.filesService.saveFilesWithKeys(
           { [key]: file },
-          `services/${title}/images`,
+          `services/${service._id}/images`,
           this.host,
           FileType.IMAGE,
         );
@@ -65,19 +91,53 @@ export class ServicesService {
       images: updatedImages,
     };
 
-    await service.save();
+    try {
+      await service.save();
+    } catch (error: any) {
+      if (error.name === 'ValidationError') {
+        throw new BadRequestException(
+          this.t('errors.SERVICES.VALIDATION_ERROR') || error.message,
+        );
+      }
+      throw error;
+    }
     return service;
   }
 
-  async getService(title: string) {
-    const service = await this.serviceModel.findOne({ title });
-    if (!service) throw new NotFoundException(this.t('errors.SERVICES.NOT_FOUND', { args: { title } }));
+  async getService(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new NotFoundException(
+        this.t('errors.SERVICES.NOT_FOUND', { args: { title: id } }),
+      );
+    }
+    const service = await this.serviceModel.findById(id);
+    if (!service)
+      throw new NotFoundException(
+        this.t('errors.SERVICES.NOT_FOUND', { args: { title: id } }),
+      );
+    return service;
+  }
+
+  async getServiceByTitle(title: string) {
+    const service = await this.serviceModel.findOne({
+      $or: [
+        { 'title.en': title },
+        { 'title.fr': title },
+        { 'title.zh': title },
+        { title: title },
+      ],
+    });
+    if (!service)
+      throw new NotFoundException(
+        this.t('errors.SERVICES.NOT_FOUND', { args: { title } }),
+      );
     return service;
   }
 
   async getAllServices() {
     const services = await this.serviceModel.find().select('title');
-    if (!services || services.length === 0) return { message: this.t('events.SERVICES.NO_SERVICES') };
+    if (!services || services.length === 0)
+      return { message: this.t('events.SERVICES.NO_SERVICES') };
     return services;
   }
 
@@ -95,7 +155,12 @@ export class ServicesService {
     ]);
 
     if (!services || services.length === 0)
-      return { message: this.t('events.SERVICES.NO_SERVICES'), total: 0, page, limit };
+      return {
+        message: this.t('events.SERVICES.NO_SERVICES'),
+        total: 0,
+        page,
+        limit,
+      };
 
     return {
       total,
@@ -106,10 +171,17 @@ export class ServicesService {
     };
   }
 
-  async deleteService(title: string) {
-    const service = await this.serviceModel.findOne({ title });
+  async deleteService(id: string) {
+    if (!isValidObjectId(id)) {
+      throw new NotFoundException(
+        this.t('errors.SERVICES.NOT_FOUND', { args: { title: id } }),
+      );
+    }
+    const service = await this.serviceModel.findById(id);
     if (!service) {
-      throw new NotFoundException(this.t('errors.SERVICES.NOT_FOUND', { args: { title } }));
+      throw new NotFoundException(
+        this.t('errors.SERVICES.NOT_FOUND', { args: { title: id } }),
+      );
     }
 
     // Delete any associated files (e.g., images)
@@ -117,20 +189,24 @@ export class ServicesService {
       const imageUrls = Object.values(service.data.images);
       for (const url of imageUrls) {
         if (typeof url === 'string') {
-            await this.filesService.deleteFileByUrl(url);
+          await this.filesService.deleteFileByUrl(url);
         }
       }
     }
 
     await this.serviceModel.deleteOne({ _id: service._id });
-    return { message: this.t('events.SERVICES.DELETE_SUCCESS', { args: { title } }) };
+    return {
+      message: this.t('events.SERVICES.DELETE_SUCCESS', {
+        args: { title: id },
+      }),
+    };
   }
 
   private t(key: string, options?: any): string {
-      const i18n = I18nContext.current();
-      if (i18n) {
-          return i18n.t(key, options);
-      }
-      return key;
+    const i18n = I18nContext.current();
+    if (i18n) {
+      return i18n.t(key, options);
+    }
+    return key;
   }
 }

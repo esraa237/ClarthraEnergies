@@ -9,22 +9,17 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { I18nContext } from 'nestjs-i18n';
 
-const NON_LOCALIZED_KEYS = new Set([
-  '_id',
-  'createdAt',
-  'updatedAt',
-  '__v',
-]);
+const NON_LOCALIZED_KEYS = new Set(['_id', 'createdAt', 'updatedAt', '__v']);
 
 @Injectable()
 export class LocalizationInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
     const bypassHeader = request.headers['x-bypass-localization'];
-    
+
     // If header is present and true, return raw data (all languages)
     if (bypassHeader === 'true') {
-        return next.handle();
+      return next.handle();
     }
 
     const i18n = I18nContext.current();
@@ -40,7 +35,11 @@ export class LocalizationInterceptor implements NestInterceptor {
     );
   }
 
-  private localizeData(data: any, lang: string, cache: WeakMap<object, any>): any {
+  private localizeData(
+    data: any,
+    lang: string,
+    cache: WeakMap<object, any>,
+  ): any {
     // Fast exits
     if (data === null || data === undefined) return data;
 
@@ -50,7 +49,10 @@ export class LocalizationInterceptor implements NestInterceptor {
     }
 
     // Preserve Mongoose ObjectId or MongoDB ObjectId
-    if (data instanceof Types.ObjectId || (data && data._bsontype === 'ObjectID')) {
+    if (
+      data instanceof Types.ObjectId ||
+      (data && data._bsontype === 'ObjectID')
+    ) {
       return data.toString();
     }
 
@@ -84,7 +86,11 @@ export class LocalizationInterceptor implements NestInterceptor {
     }
 
     // Fast localized string check (hot path)
-    if (data.en !== undefined || data.fr !== undefined || data.zh !== undefined) {
+    if (
+      data.en !== undefined ||
+      data.fr !== undefined ||
+      data.zh !== undefined
+    ) {
       const val = data[lang] || data.en || data.fr || data.zh;
       // Note: We don't cache localized string results directly as strings aren't objects,
       // but the parent object is cached.
@@ -92,8 +98,12 @@ export class LocalizationInterceptor implements NestInterceptor {
     }
 
     // Re-check after potential toObject conversion
-    if (data instanceof Date || data instanceof Types.ObjectId || (data && data._bsontype === 'ObjectID')) {
-        return data instanceof Date ? data : data.toString();
+    if (
+      data instanceof Date ||
+      data instanceof Types.ObjectId ||
+      (data && data._bsontype === 'ObjectID')
+    ) {
+      return data instanceof Date ? data : data.toString();
     }
 
     const result: any = {};

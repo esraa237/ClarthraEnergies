@@ -29,10 +29,12 @@
     "NOT_FOUND": "未找到职位",
     "RETRIEVE_ONE_ERROR": "无法检索职位",
     "UPDATE_ERROR": "无法更新职位",
-    "DELETE_ERROR": "无法删除职位"
+    "DELETE_ERROR": "无法删除职位",
+    "VALIDATION_ERROR": "职位验证失败。必须提供所有必需的多语言字段。"
   },
   "SERVICES": {
     "TITLE_REQUIRED": "服务标题为必填项",
-    "NOT_FOUND": "未找到服务 '{title}'"
+    "NOT_FOUND": "未找到服务 '{title}'",
+    "VALIDATION_ERROR": "服务验证失败。必须提供所有必需的多语言字段。"
   }
 }

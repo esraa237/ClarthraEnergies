@@ -29,10 +29,12 @@
     "NOT_FOUND": "Position not found",
     "RETRIEVE_ONE_ERROR": "Failed to retrieve position",
     "UPDATE_ERROR": "Failed to update position",
-    "DELETE_ERROR": "Failed to delete position"
+    "DELETE_ERROR": "Failed to delete position",
+    "VALIDATION_ERROR": "Position validation failed. All required multi-language fields must be provided."
   },
   "SERVICES": {
     "TITLE_REQUIRED": "Service title is required",
-    "NOT_FOUND": "Service '{title}' not found"
+    "NOT_FOUND": "Service '{title}' not found",
+    "VALIDATION_ERROR": "Service validation failed. All required multi-language fields must be provided."
   }
 }

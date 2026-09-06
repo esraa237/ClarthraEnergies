@@ -17,8 +17,8 @@ import { sanitizeHtmlField } from '../utils/sanitize.util';
 export class PositionsService {
   constructor(
     @InjectModel(Position.name) private positionModel: Model<Position>,
-     @InjectModel(Application.name) private applicationModel: Model<Application>,
-  ) { }
+    @InjectModel(Application.name) private applicationModel: Model<Application>,
+  ) {}
 
   async create(data: CreatePositionDto): Promise<Position> {
     try {
@@ -31,7 +31,15 @@ export class PositionsService {
       };
       return await this.positionModel.create(sanitizedData);
     } catch (error) {
-      throw new InternalServerErrorException(I18nContext.current()!.t('errors.POSITIONS.CREATE_ERROR'));
+      if (error.name === 'ValidationError') {
+        throw new BadRequestException(
+          I18nContext.current()?.t('errors.POSITIONS.VALIDATION_ERROR') ||
+            error.message,
+        );
+      }
+      throw new InternalServerErrorException(
+        I18nContext.current()!.t('errors.POSITIONS.CREATE_ERROR'),
+      );
     }
   }
 
@@ -92,7 +100,9 @@ export class PositionsService {
         data,
       };
     } catch (error) {
-      throw new InternalServerErrorException(I18nContext.current()!.t('errors.POSITIONS.RETRIEVE_ERROR'));
+      throw new InternalServerErrorException(
+        I18nContext.current()!.t('errors.POSITIONS.RETRIEVE_ERROR'),
+      );
     }
   }
 
@@ -141,16 +151,23 @@ export class PositionsService {
       ]);
 
       const position = result[0];
-      if (!position) throw new NotFoundException(I18nContext.current()!.t('errors.POSITIONS.NOT_FOUND'));
+      if (!position)
+        throw new NotFoundException(
+          I18nContext.current()!.t('errors.POSITIONS.NOT_FOUND'),
+        );
       return position;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(I18nContext.current()!.t('errors.POSITIONS.RETRIEVE_ONE_ERROR'));
+      throw new InternalServerErrorException(
+        I18nContext.current()!.t('errors.POSITIONS.RETRIEVE_ONE_ERROR'),
+      );
     }
   }
 
-
-  async update(id: string, data: Partial<CreatePositionDto>): Promise<Position> {
+  async update(
+    id: string,
+    data: Partial<CreatePositionDto>,
+  ): Promise<Position> {
     this.validateId(id);
     try {
       // Backend now receives full localized objects (e.g. { en: "...", fr: "..." })
@@ -158,22 +175,50 @@ export class PositionsService {
       const sanitizedData = {
         ...data,
       };
-      
-      if (sanitizedData.whatWeOffer) sanitizedData.whatWeOffer = sanitizeHtmlField(sanitizedData.whatWeOffer);
-      if (sanitizedData.whyWeAreLooking) sanitizedData.whyWeAreLooking = sanitizeHtmlField(sanitizedData.whyWeAreLooking);
-      if (sanitizedData.responsibilities) sanitizedData.responsibilities = sanitizeHtmlField(sanitizedData.responsibilities);
-      if (sanitizedData.skills) sanitizedData.skills = sanitizeHtmlField(sanitizedData.skills);
-      
-      const position = await this.positionModel.findByIdAndUpdate(id, sanitizedData, {
-        new: true,
-      });
-      if (!position) throw new NotFoundException(I18nContext.current()?.t('errors.POSITIONS.NOT_FOUND') || 'Position not found');
+
+      if (sanitizedData.whatWeOffer)
+        sanitizedData.whatWeOffer = sanitizeHtmlField(
+          sanitizedData.whatWeOffer,
+        );
+      if (sanitizedData.whyWeAreLooking)
+        sanitizedData.whyWeAreLooking = sanitizeHtmlField(
+          sanitizedData.whyWeAreLooking,
+        );
+      if (sanitizedData.responsibilities)
+        sanitizedData.responsibilities = sanitizeHtmlField(
+          sanitizedData.responsibilities,
+        );
+      if (sanitizedData.skills)
+        sanitizedData.skills = sanitizeHtmlField(sanitizedData.skills);
+
+      const position = await this.positionModel.findByIdAndUpdate(
+        id,
+        sanitizedData,
+        {
+          new: true,
+        },
+      );
+      if (!position)
+        throw new NotFoundException(
+          I18nContext.current()?.t('errors.POSITIONS.NOT_FOUND') ||
+            'Position not found',
+        );
       return position;
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
+      if (error.name === 'ValidationError') {
+        throw new BadRequestException(
+          I18nContext.current()?.t('errors.POSITIONS.VALIDATION_ERROR') ||
+            error.message,
+        );
+      }
       console.error('Error updating position:', error);
       const i18n = I18nContext.current();
-      throw new InternalServerErrorException(i18n ? i18n.t('errors.POSITIONS.UPDATE_ERROR') : 'Error updating position');
+      throw new InternalServerErrorException(
+        i18n
+          ? i18n.t('errors.POSITIONS.UPDATE_ERROR')
+          : 'Error updating position',
+      );
     }
   }
 
@@ -181,20 +226,27 @@ export class PositionsService {
     this.validateId(id);
     try {
       const position = await this.positionModel.findById(id);
-      if (!position) throw new NotFoundException(I18nContext.current()!.t('errors.POSITIONS.NOT_FOUND'));
+      if (!position)
+        throw new NotFoundException(
+          I18nContext.current()!.t('errors.POSITIONS.NOT_FOUND'),
+        );
 
       await this.applicationModel.deleteMany({ positionId: id });
 
       await this.positionModel.findByIdAndDelete(id);
     } catch (error) {
       if (error instanceof NotFoundException) throw error;
-      throw new InternalServerErrorException(I18nContext.current()!.t('errors.POSITIONS.DELETE_ERROR'));
+      throw new InternalServerErrorException(
+        I18nContext.current()!.t('errors.POSITIONS.DELETE_ERROR'),
+      );
     }
   }
 
   private validateId(id: string) {
     if (!isValidObjectId(id)) {
-      throw new BadRequestException(I18nContext.current()?.t('errors.GLOBAL.INVALID_ID') || 'Invalid ID');
+      throw new BadRequestException(
+        I18nContext.current()?.t('errors.GLOBAL.INVALID_ID') || 'Invalid ID',
+      );
     }
   }
 
