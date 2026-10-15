@@ -244,4 +244,10 @@ export class UsersService {
     const existingUser = await this.userModel.findOne({ email });
     if (existingUser) throw new ConflictException(isProfileEmail ? UserMessages.EMAIL_ALREADY_EXISTS_OR_COMPLETE_EMAIL_DONT_SEND : UserMessages.EMAIL_ALREADY_EXISTS);
   }
+
+  async hasSuperAdmin(): Promise<boolean> {
+  return !!(await this.userModel.exists({ role: Role.SUPER_ADMIN }));
 }
+}
+
+
