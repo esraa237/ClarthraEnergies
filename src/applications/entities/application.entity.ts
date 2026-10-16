@@ -11,7 +11,7 @@ export class Application extends Document {
     @Prop()
     lastName: string;
 
-    @Prop({ required: true })
+    @Prop({ required: true, lowercase: true, trim: true })
     email: string;
 
     @Prop()
@@ -38,3 +38,15 @@ export class Application extends Document {
 
 
 export const ApplicationSchema = SchemaFactory.createForClass(Application);
+
+// One application per email per position.
+// Partial index: only applies when positionId is an actual ObjectId, so Open
+// Applications (positionId missing OR null) are never constrained.
+ApplicationSchema.index(
+    { email: 1, positionId: 1 },
+    {
+        unique: true,
+        name: 'unique_email_per_position',
+        partialFilterExpression: { positionId: { $type: 'objectId' } },
+    },
+);

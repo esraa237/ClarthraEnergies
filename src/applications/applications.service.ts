@@ -1,4 +1,9 @@
-import { Injectable, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ConflictException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { isValidObjectId, Model } from 'mongoose';
 import { ApplicationDataDto } from './dto/application.dto';
@@ -19,6 +24,8 @@ export class ApplicationsService {
   ) { }
 
   async create(body: ApplicationDataDto, files: Record<string, Express.Multer.File[]>) {
+    const email = body.email.trim().toLowerCase();
+
     let positionId: null | string = null;
     if (body.positionId) {
       if (!isValidObjectId(body.positionId)) {
@@ -31,7 +38,20 @@ export class ApplicationsService {
       }
 
       positionId = body.positionId;
+
+      // Duplicate check BEFORE saving any files.
+      // Case-insensitive collation also catches legacy records stored with mixed-case emails.
+      const duplicate = await this.applicationModel
+        .findOne({ email, positionId })
+        .collation({ locale: 'en', strength: 2 })
+        .select('_id')
+        .lean();
+
+      if (duplicate) {
+        throw new ConflictException(I18nContext.current()!.t('errors.APPLICATIONS.DUPLICATE_APPLICATION'));
+      }
     }
+
     const fileMap: Record<string, Express.Multer.File> = {};
     for (const key in files) {
       if (files[key] && files[key][0]) {
@@ -45,17 +65,32 @@ export class ApplicationsService {
         ? await this.filesService.saveFilesWithKeys(fileMap, 'applications', host, FileType.FILE)
         : {};
 
-    const created = await this.applicationModel.create({
-      ...body,
-      positionId,
-      files: {
-        cv: savedFiles.cv || null,
-        coverLetter: savedFiles.coverLetter || null,
-        employeeReference: savedFiles.employeeReference || null,
-        certificate: savedFiles.certificate || null,
-        other: savedFiles.other || null,
-      },
-    });
+    let created;
+    try {
+      created = await this.applicationModel.create({
+        ...body,
+        email,
+        positionId,
+        files: {
+          cv: savedFiles.cv || null,
+          coverLetter: savedFiles.coverLetter || null,
+          employeeReference: savedFiles.employeeReference || null,
+          certificate: savedFiles.certificate || null,
+          other: savedFiles.other || null,
+        },
+      });
+    } catch (error) {
+      // Don't leave orphaned uploads if the insert fails
+      for (const url of Object.values(savedFiles)) {
+        await this.filesService.deleteFileByUrl(url);
+      }
+      // Race condition: two simultaneous requests passed the check above;
+      // the unique index rejects the second one.
+      if (error?.code === 11000) {
+        throw new ConflictException(I18nContext.current()!.t('errors.APPLICATIONS.DUPLICATE_APPLICATION'));
+      }
+      throw error;
+    }
 
     return {
       message: I18nContext.current()!.t('events.APPLICATIONS.SUBMIT_SUCCESS'),

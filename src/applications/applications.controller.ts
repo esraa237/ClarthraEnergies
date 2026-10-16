@@ -68,6 +68,10 @@ export class ApplicationsController {
     },
   })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input data or missing required fields' })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: 'An application with this email already exists for this position',
+  })
   @ApiResponse({ status: HttpStatus.INTERNAL_SERVER_ERROR, description: 'Unexpected server error' })
   @UseInterceptors(
     FileFieldsInterceptor([

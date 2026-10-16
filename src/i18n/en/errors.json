@@ -8,7 +8,8 @@
     "POSITION_NOT_FOUND": "Position not found",
     "NOT_FOUND": "Application not found",
     "NOT_FOUND_ID": "Application with ID '{id}' not found",
-    "STATS_ERROR": "Failed to retrieve applications statistics"
+    "STATS_ERROR": "Failed to retrieve applications statistics",
+    "DUPLICATE_APPLICATION": "You have already applied for this position."
   },
   "CONFIGURATION": {
     "NOT_FOUND": "No configuration found. Please create one."

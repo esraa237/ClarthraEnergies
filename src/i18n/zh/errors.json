@@ -8,7 +8,8 @@
     "POSITION_NOT_FOUND": "未找到职位",
     "NOT_FOUND": "未找到申请",
     "NOT_FOUND_ID": "未找到 ID 为 '{id}' 的申请",
-    "STATS_ERROR": "无法检索申请统计信息"
+    "STATS_ERROR": "无法检索申请统计信息",
+    "DUPLICATE_APPLICATION": "您已经申请过该职位。"
   },
   "CONFIGURATION": {
     "NOT_FOUND": "未找到配置。请创建一个。"

@@ -8,7 +8,8 @@
     "POSITION_NOT_FOUND": "Poste introuvable",
     "NOT_FOUND": "Candidature introuvable",
     "NOT_FOUND_ID": "Candidature avec l'ID '{id}' introuvable",
-    "STATS_ERROR": "Échec de la récupération des statistiques des candidatures"
+    "STATS_ERROR": "Échec de la récupération des statistiques des candidatures",
+    "DUPLICATE_APPLICATION": "Vous avez déjà postulé pour ce poste."
   },
   "CONFIGURATION": {
     "NOT_FOUND": "Aucune configuration trouvée. Veuillez en créer une."
