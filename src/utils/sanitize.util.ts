@@ -9,7 +9,7 @@ export const sanitizeOptions: sanitizeHtml.IOptions = {
     ],
     allowedAttributes: {
       a: ["href", "target", "rel"],
-      '*': ["style", "class"],
+      '*': ["style"],
     },
     allowedStyles: {
       '*': {
@@ -17,6 +17,8 @@ export const sanitizeOptions: sanitizeHtml.IOptions = {
         'color': [/^#(0x)?[0-9a-f]+$/i, /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/],
         'background-color': [/^#(0x)?[0-9a-f]+$/i, /^rgb\(\s*(\d{1,3})\s*,\s*(\d{1,3})\s*,\s*(\d{1,3})\s*\)$/],
         'text-align': [/^left$/, /^right$/, /^center$/, /^justify$/],
+        'font-size': [/^(12|14|16|18|20|24|28|32)px$/],
+        'font-family': [/^(Arial|Georgia|Verdana|Outfit)$/i],
       }
     }
 };
@@ -27,16 +29,16 @@ export function sanitizeHtmlField(fieldValue: any): any {
     if (typeof fieldValue === 'string') {
         return sanitizeHtml(fieldValue, sanitizeOptions);
     }
+
+    if (Array.isArray(fieldValue)) {
+        return fieldValue.map((value) => sanitizeHtmlField(value));
+    }
     
     if (typeof fieldValue === 'object') {
         const sanitizedObj: any = {};
         for (const key in fieldValue) {
             if (Object.prototype.hasOwnProperty.call(fieldValue, key)) {
-                if (typeof fieldValue[key] === 'string') {
-                     sanitizedObj[key] = sanitizeHtml(fieldValue[key], sanitizeOptions);
-                } else {
-                     sanitizedObj[key] = fieldValue[key]; // keep as is if not string
-                }
+                sanitizedObj[key] = sanitizeHtmlField(fieldValue[key]);
             }
         }
         return sanitizedObj;
